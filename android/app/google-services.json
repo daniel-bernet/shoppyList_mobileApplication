@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "779857018826",
+    "project_id": "shoppylist-519ba",
+    "storage_bucket": "shoppylist-519ba.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:779857018826:android:219dd4891e4ea0110f5933",
+        "android_client_info": {
+          "package_name": "com.example.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQvBbjoWbAM-8AS0sBLBlESr_fqKOZm6c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:779857018826:android:d87da53152f2f50a0f5933",
+        "android_client_info": {
+          "package_name": "com.shoppylist.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQvBbjoWbAM-8AS0sBLBlESr_fqKOZm6c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
