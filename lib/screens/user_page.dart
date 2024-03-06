@@ -41,11 +41,6 @@ class _UserPageState extends State<UserPage> {
     return Scaffold(
       body: ListView(
         children: [
-          ListTile(
-            leading: const Icon(Icons.logout),
-            title: const Text(AppStrings.logOut),
-            onTap: _logOut,
-          ),
           SwitchListTile(
             title: const Text(AppStrings.darkMode),
             value: isDarkMode,
@@ -56,14 +51,19 @@ class _UserPageState extends State<UserPage> {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.delete),
-            title: const Text(AppStrings.deleteAccount),
-            onTap: _deleteAccount,
+            trailing: const Icon(Icons.logout),
+            title: const Text(AppStrings.logOut),
+            onTap: _logOut,
           ),
           ListTile(
-            leading: const Icon(Icons.password),
+            trailing: const Icon(Icons.password),
             title: const Text(AppStrings.changePassword),
             onTap: _changePassword,
+          ),
+          ListTile(
+            trailing: const Icon(Icons.delete),
+            title: const Text(AppStrings.deleteAccount),
+            onTap: _deleteAccount,
           ),
         ],
       ),
