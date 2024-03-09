@@ -27,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
 
   late final TextEditingController emailController;
   late final TextEditingController passwordController;
+  final ApiService apiService = ApiService();
 
   void initializeControllers() {
     emailController = TextEditingController()..addListener(controllerListener);
@@ -55,14 +56,25 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
-    initializeControllers();
     super.initState();
+    initializeControllers();
+    validateTokenAndNavigate();
   }
 
   @override
   void dispose() {
     disposeControllers();
     super.dispose();
+  }
+
+  Future<void> validateTokenAndNavigate() async {
+    final bool isValidToken = await apiService.validateToken();
+    if (isValidToken) {
+      SnackbarHelper.showSnackBar(AppStrings.loggedIn);
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => const MainPage(),
+      ));
+    }
   }
 
   void _login() async {

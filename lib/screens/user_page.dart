@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../utils/helpers/navigation_helper.dart';
-import '../utils/helpers/snackbar_helper.dart';
 import '../values/app_strings.dart';
 import '../values/app_routes.dart';
 
@@ -16,13 +15,17 @@ class _UserPageState extends State<UserPage> {
   ApiService apiService = ApiService();
 
   void _logOut() async {
+    await apiService.logOut();
     NavigationHelper.pushReplacementNamed(AppRoutes.login);
-    // DELETE JWT TOKEN HERE!!!!!!
   }
 
-  void _deleteAccount() {}
+  void _changePassword() {
+    // Implement later!!!!!!
+  }
 
-  void _changePassword() {}
+  void _deleteAccount() {
+    // Implement later!!!!!!!!
+  }
 
   @override
   Widget build(BuildContext context) {

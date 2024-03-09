@@ -34,10 +34,31 @@ class ApiService {
     );
 
     if (response.statusCode == 201) {
-      // Optionally handle registration-specific JWT token logic here
+      final jwtToken = jsonDecode(response.body)['access_token'];
+      await storage.write(key: 'jwtToken', value: jwtToken);
       return true;
     } else {
       return false;
     }
+  }
+
+  Future<bool> validateToken() async {
+    final jwtToken = await storage.read(key: 'jwtToken');
+    if (jwtToken == null) {
+      return false;
+    }
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/validate-token'),
+      headers: {
+        'Authorization': 'Bearer $jwtToken',
+      },
+    );
+
+    return response.statusCode == 200;
+  }
+
+  Future<void> logOut() async {
+    await storage.deleteAll();
   }
 }
