@@ -1,8 +1,8 @@
 import 'package:app/screens/main_page.dart';
+import 'package:app/services/api_service.dart';
 import 'package:app/utils/helpers/snackbar_helper.dart';
 import 'package:app/values/app_regex.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import '../components/app_text_form_field.dart';
 import '../utils/common_widgets/gradient_background.dart';
@@ -65,6 +65,25 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  void _login() async {
+    if (fieldValidNotifier.value && _formKey.currentState!.validate()) {
+      final apiService = ApiService();
+      final success = await apiService.login(
+        emailController.text.trim(),
+        passwordController.text.trim(),
+      );
+
+      if (success) {
+        SnackbarHelper.showSnackBar(AppStrings.loggedIn);
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => const MainPage(),
+        ));
+      } else {
+        SnackbarHelper.showSnackBar(AppStrings.loginFailed, isError: true);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,7 +97,8 @@ class _LoginPageState extends State<LoginPage> {
                 style: AppTheme.lightTheme.textTheme.titleLarge,
               ),
               const SizedBox(height: 6),
-              Text(AppStrings.signInToYourAccount, style: AppTheme.lightTheme.textTheme.bodySmall),
+              Text(AppStrings.signInToYourAccount,
+                  style: AppTheme.lightTheme.textTheme.bodySmall),
             ],
           ),
           Form(
@@ -146,38 +166,7 @@ class _LoginPageState extends State<LoginPage> {
                     valueListenable: fieldValidNotifier,
                     builder: (_, isValid, __) {
                       return FilledButton(
-                        onPressed: isValid
-                            ? () async {
-                                try {
-                                  // Attempt to sign in the user using Firebase Auth
-                                  await FirebaseAuth.instance
-                                      .signInWithEmailAndPassword(
-                                    email: emailController.text.trim(),
-                                    password: passwordController.text.trim(),
-                                  );
-                                  SnackbarHelper.showSnackBar(
-                                      AppStrings.loggedIn);
-                                  if (context.mounted) {
-                                    Navigator.of(context)
-                                        .pushReplacement(MaterialPageRoute(
-                                      builder: (context) => const MainPage(),
-                                    ));
-                                  }
-                                } on FirebaseAuthException catch (e) {
-                                  // Handle different Firebase Auth exceptions
-                                  String errorMessage =
-                                      'An error occurred. Please try again.';
-                                  if (e.code == 'user-not-found') {
-                                    errorMessage =
-                                        'No user found for that email.';
-                                  } else if (e.code == 'wrong-password') {
-                                    errorMessage = 'Wrong password provided.';
-                                  }
-                                  SnackbarHelper.showSnackBar(errorMessage,
-                                      isError: true);
-                                }
-                              }
-                            : null,
+                        onPressed: isValid ? _login : null,
                         child: const Text(AppStrings.login),
                       );
                     },
@@ -192,7 +181,8 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               Text(
                 AppStrings.doNotHaveAnAccount,
-                style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(color: Colors.black),
+                style: AppTheme.lightTheme.textTheme.bodySmall
+                    ?.copyWith(color: Colors.black),
               ),
               const SizedBox(width: 4),
               TextButton(

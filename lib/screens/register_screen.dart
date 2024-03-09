@@ -1,5 +1,6 @@
 import 'package:app/screens/main_page.dart';
 import 'package:app/utils/helpers/snackbar_helper.dart';
+import 'package:app/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../components/app_text_form_field.dart';
@@ -59,7 +60,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
     if (AppRegex.emailRegex.hasMatch(email) &&
         AppRegex.passwordRegex.hasMatch(password) &&
-        AppRegex.passwordRegex.hasMatch(confirmPassword)) {
+        AppRegex.passwordRegex.hasMatch(confirmPassword) &&
+        password == confirmPassword) {
       fieldValidNotifier.value = true;
     } else {
       fieldValidNotifier.value = false;
@@ -78,6 +80,27 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
+  void _register() async {
+    if (_formKey.currentState!.validate()) {
+      final apiService = ApiService();
+      final success = await apiService.register(
+        nameController.text.trim(),
+        emailController.text.trim(),
+        passwordController.text.trim(),
+      );
+
+      if (success) {
+        SnackbarHelper.showSnackBar(AppStrings.registrationComplete);
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => const MainPage(),
+        ));
+      } else {
+        SnackbarHelper.showSnackBar(AppStrings.registrationFailed,
+            isError: true);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,9 +108,11 @@ class _RegisterPageState extends State<RegisterPage> {
         children: [
           GradientBackground(
             children: [
-              Text(AppStrings.register, style: AppTheme.lightTheme.textTheme.titleLarge),
+              Text(AppStrings.register,
+                  style: AppTheme.lightTheme.textTheme.titleLarge),
               const SizedBox(height: 6),
-              Text(AppStrings.createYourAccount, style: AppTheme.lightTheme.textTheme.bodySmall),
+              Text(AppStrings.createYourAccount,
+                  style: AppTheme.lightTheme.textTheme.bodySmall),
             ],
           ),
           Padding(
@@ -222,45 +247,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     builder: (_, isValid, __) {
                       return FilledButton(
                         onPressed: isValid
-                            ? () async {
-                                try {
-                                  // Attempt to create a new user with Firebase Auth
-                                  await FirebaseAuth.instance
-                                      .createUserWithEmailAndPassword(
-                                    email: emailController.text.trim(),
-                                    password: passwordController.text.trim(),
-                                  );
-
-                                  // Show success message using SnackbarHelper
-                                  SnackbarHelper.showSnackBar(
-                                      AppStrings.registrationComplete);
-
-                                  if (context.mounted) {
-                                    Navigator.of(context)
-                                        .pushReplacement(MaterialPageRoute(
-                                      builder: (context) => const MainPage(),
-                                    ));
-                                  }
-
-                                  nameController.clear();
-                                  emailController.clear();
-                                  passwordController.clear();
-                                  confirmPasswordController.clear();
-                                } on FirebaseAuthException catch (e) {
-                                  String errorMessage =
-                                      'An error occurred. Please try again.';
-                                  if (e.code == 'weak-password') {
-                                    errorMessage =
-                                        'The password provided is too weak.';
-                                  } else if (e.code == 'email-already-in-use') {
-                                    errorMessage =
-                                        'An account already exists for that email.';
-                                  }
-                                  SnackbarHelper.showSnackBar(errorMessage,
-                                      isError: true);
-                                }
-                              }
-                            : null,
+                            ? _register
+                            : null, // This line calls the _register method
                         child: const Text(AppStrings.register),
                       );
                     },
@@ -274,7 +262,8 @@ class _RegisterPageState extends State<RegisterPage> {
             children: [
               Text(
                 AppStrings.iHaveAnAccount,
-                style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(color: Colors.black),
+                style: AppTheme.lightTheme.textTheme.bodySmall
+                    ?.copyWith(color: Colors.black),
               ),
               TextButton(
                 onPressed: () => NavigationHelper.pushReplacementNamed(

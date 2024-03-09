@@ -16,7 +16,9 @@ class AppStrings {
   static const String orLoginWith = 'or Login with';
 
   static const String loggedIn = 'Logged In!';
+  static const String loginFailed = 'Login Failed!';
   static const String registrationComplete = 'Registration Complete!';
+  static const String registrationFailed = 'Registration Failed!';
 
   static const String name = 'Name';
   static const String pleaseEnterName = 'Please, Enter Name';
