@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:app/values/app_colors.dart';
-import 'package:app/components/custom_app_bar.dart'; // Ensure this path is correct
+import 'package:app/components/custom_app_bar.dart';
 import 'shopping_page.dart';
 import 'add_item_page.dart';
 import 'view_list_page.dart';

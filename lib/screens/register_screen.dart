@@ -2,7 +2,6 @@ import 'package:app/screens/main_page.dart';
 import 'package:app/utils/helpers/snackbar_helper.dart';
 import 'package:app/services/api_service.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../components/app_text_form_field.dart';
 import '../utils/common_widgets/gradient_background.dart';
 import '../utils/helpers/navigation_helper.dart';
