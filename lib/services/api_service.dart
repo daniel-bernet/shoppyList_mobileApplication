@@ -61,4 +61,22 @@ class ApiService {
   Future<void> logOut() async {
     await storage.deleteAll();
   }
+
+  Future<bool> createShoppingList(String title) async {
+    final jwtToken = await storage.read(key: 'jwtToken');
+    if (jwtToken == null) {
+      return false;
+    }
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/shopping_lists'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $jwtToken',
+      },
+      body: jsonEncode({'title': title}),
+    );
+
+    return response.statusCode == 201;
+  }
 }
