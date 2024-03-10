@@ -172,4 +172,27 @@ class ApiService {
 
     return response.statusCode == 200;
   }
+
+  Future<bool> addProductToShoppingList(String listId, String name,
+      String quantity, String unitOfMeasurement) async {
+    final jwtToken = await storage.read(key: 'jwtToken');
+    if (jwtToken == null) {
+      return false;
+    }
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/shopping_lists/$listId/products'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $jwtToken',
+      },
+      body: jsonEncode({
+        'name': name,
+        'quantity': quantity,
+        'unit_of_measurement': unitOfMeasurement,
+      }),
+    );
+
+    return response.statusCode == 201;
+  }
 }
