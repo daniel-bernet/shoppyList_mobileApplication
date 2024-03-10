@@ -6,7 +6,7 @@ class AppTheme {
 
   static final ThemeData lightTheme = ThemeData(
     useMaterial3: true,
-    colorScheme: const ColorScheme.light(
+    colorScheme: ColorScheme.light(
       primary: AppColors.lightPrimaryColor,
       onPrimary: AppColors.lightOnPrimaryColor,
       secondary: AppColors.lightSecondaryColor,

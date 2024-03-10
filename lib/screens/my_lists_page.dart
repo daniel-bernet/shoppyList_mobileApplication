@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:app/services/api_service.dart';
 import 'package:app/utils/helpers/snackbar_helper.dart';
+import 'package:app/components/list_component.dart';
 
 class MyListsPage extends StatefulWidget {
   const MyListsPage({super.key});
@@ -13,6 +14,29 @@ class MyListsPage extends StatefulWidget {
 class _MyListsPageState extends State<MyListsPage> {
   final TextEditingController _listTitleController = TextEditingController();
   final ApiService _apiService = ApiService();
+  List<dynamic>? _shoppingLists;
+  String? _userEmail;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchLists();
+    _fetchUserEmail();
+  }
+
+  void _fetchUserEmail() async {
+    final email = await _apiService.getUserEmail();
+    setState(() {
+      _userEmail = email;
+    });
+  }
+
+  void _fetchLists() async {
+    var shoppingLists = await _apiService.getShoppingLists();
+    setState(() {
+      _shoppingLists = shoppingLists;
+    });
+  }
 
   void _createList() async {
     final title = _listTitleController.text.trim();
@@ -25,6 +49,7 @@ class _MyListsPageState extends State<MyListsPage> {
     if (success) {
       SnackbarHelper.showSnackBar('List created successfully');
       _listTitleController.clear();
+      _fetchLists();
     } else {
       SnackbarHelper.showSnackBar('Failed to create list', isError: true);
     }
@@ -33,9 +58,6 @@ class _MyListsPageState extends State<MyListsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Lists'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -53,6 +75,24 @@ class _MyListsPageState extends State<MyListsPage> {
               onPressed: _createList,
               child: const Text('Create List'),
             ),
+            const SizedBox(height: 20),
+            Expanded(
+                child: _shoppingLists == null
+                    ? const Center(child: CircularProgressIndicator())
+                    : ListView.builder(
+                        itemCount: _shoppingLists!.length,
+                        itemBuilder: (context, index) {
+                          var list = _shoppingLists![index];
+                          return ListComponent(
+                            title: list['title'],
+                            listId: list['id'],
+                            createdAt: DateTime.parse(list['created_at']),
+                            updatedAt: DateTime.parse(list['updated_at']),
+                            collaborators: list['collaborators'].cast<String>(),
+                            isOwner: list['is_owner'],
+                          );
+                        },
+                      )),
           ],
         ),
       ),

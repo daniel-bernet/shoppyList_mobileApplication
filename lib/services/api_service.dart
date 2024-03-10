@@ -14,8 +14,10 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
+      await storage.deleteAll();
       final jwtToken = jsonDecode(response.body)['access_token'];
       await storage.write(key: 'jwtToken', value: jwtToken);
+      await storage.write(key: 'email', value: email);
       return true;
     } else {
       return false;
@@ -34,8 +36,10 @@ class ApiService {
     );
 
     if (response.statusCode == 201) {
+      await storage.deleteAll();
       final jwtToken = jsonDecode(response.body)['access_token'];
       await storage.write(key: 'jwtToken', value: jwtToken);
+      await storage.write(key: 'email', value: email);
       return true;
     } else {
       return false;
@@ -55,7 +59,12 @@ class ApiService {
       },
     );
 
-    return response.statusCode == 200;
+    if (response.statusCode != 200) {
+      await storage.deleteAll();
+      return false;
+    }
+
+    return true;
   }
 
   Future<void> logOut() async {
@@ -79,4 +88,79 @@ class ApiService {
 
     return response.statusCode == 201;
   }
+
+  Future<List<dynamic>?> getShoppingLists() async {
+    final jwtToken = await storage.read(key: 'jwtToken');
+    if (jwtToken == null) {
+      return null;
+    }
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/shopping_lists'),
+      headers: {
+        'Authorization': 'Bearer $jwtToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return null;
+    }
+  }
+
+  Future<bool> addCollaborator(String listId, String email) async {
+    final jwtToken = await storage.read(key: 'jwtToken');
+    if (jwtToken == null) {
+      return false;
+    }
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/shopping_lists/$listId/collaborators'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $jwtToken',
+      },
+      body: jsonEncode({'email': email}),
+    );
+
+    return response.statusCode == 200;
+  }
+
+  Future<bool> removeCollaborator(String listId, String email) async {
+    final jwtToken = await storage.read(key: 'jwtToken');
+    if (jwtToken == null) {
+      return false;
+    }
+
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/shopping_lists/$listId/collaborators/$email'),
+      headers: {
+        'Authorization': 'Bearer $jwtToken',
+      },
+    );
+
+    return response.statusCode == 200;
+  }
+
+  Future<String?> getUserEmail() async {
+    return await storage.read(key: 'email');
+  }
+
+  Future<bool> leaveListAsCollaborator(String listId) async {
+  final jwtToken = await storage.read(key: 'jwtToken');
+  if (jwtToken == null) {
+    return false;
+  }
+
+  final response = await http.post(
+    Uri.parse('$_baseUrl/shopping_lists/$listId/leave'),
+    headers: {
+      'Authorization': 'Bearer $jwtToken',
+    },
+  );
+
+  return response.statusCode == 200;
+}
+
 }
