@@ -1,4 +1,3 @@
-// /lib/screens/my_lists_page.dart
 import 'package:flutter/material.dart';
 import 'package:app/services/api_service.dart';
 import 'package:app/utils/helpers/snackbar_helper.dart';
@@ -15,23 +14,15 @@ class _MyListsPageState extends State<MyListsPage> {
   final TextEditingController _listTitleController = TextEditingController();
   final ApiService _apiService = ApiService();
   List<dynamic>? _shoppingLists;
-  String? _userEmail;
 
   @override
   void initState() {
     super.initState();
     _fetchLists();
-    _fetchUserEmail();
-  }
-
-  void _fetchUserEmail() async {
-    final email = await _apiService.getUserEmail();
-    setState(() {
-      _userEmail = email;
-    });
   }
 
   void _fetchLists() async {
+    print("fetching....");
     var shoppingLists = await _apiService.getShoppingLists();
     setState(() {
       _shoppingLists = shoppingLists;
@@ -90,6 +81,7 @@ class _MyListsPageState extends State<MyListsPage> {
                             updatedAt: DateTime.parse(list['updated_at']),
                             collaborators: list['collaborators'].cast<String>(),
                             isOwner: list['is_owner'],
+                            fetchLists: _fetchLists,
                           );
                         },
                       )),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../utils/helpers/snackbar_helper.dart';
+import '../components/reusable_alert_dialog.dart';
 
 class EditListPage extends StatefulWidget {
   final String listId;
@@ -8,6 +9,7 @@ class EditListPage extends StatefulWidget {
   final DateTime createdAt;
   final DateTime updatedAt;
   final List<String> collaborators;
+  final VoidCallback onDelete;
 
   const EditListPage({
     super.key,
@@ -16,6 +18,7 @@ class EditListPage extends StatefulWidget {
     required this.createdAt,
     required this.updatedAt,
     required this.collaborators,
+    required this.onDelete,
   });
 
   @override
@@ -24,7 +27,8 @@ class EditListPage extends StatefulWidget {
 
 class _EditListPageState extends State<EditListPage> {
   final ApiService _apiService = ApiService();
-  final TextEditingController _collaboratorEmailController = TextEditingController();
+  final TextEditingController _collaboratorEmailController =
+      TextEditingController();
 
   void _addCollaborator() async {
     final email = _collaboratorEmailController.text.trim();
@@ -53,7 +57,44 @@ class _EditListPageState extends State<EditListPage> {
         widget.collaborators.remove(email);
       });
     } else {
-      SnackbarHelper.showSnackBar('Failed to remove collaborator', isError: true);
+      SnackbarHelper.showSnackBar('Failed to remove collaborator',
+          isError: true);
+    }
+  }
+
+  void _showDeleteConfirmation() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ReusableAlertDialog(
+          title: 'Confirm Deletion',
+          content: 'Are you sure you want to delete this list?',
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                _deleteList();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteList() async {
+    final success = await _apiService.deleteShoppingList(widget.listId);
+    if (success) {
+      widget.onDelete();
+      SnackbarHelper.showSnackBar('List deleted successfully');
+      Navigator.of(context).pop();
+    } else {
+      SnackbarHelper.showSnackBar('Failed to delete list', isError: true);
     }
   }
 
@@ -91,6 +132,11 @@ class _EditListPageState extends State<EditListPage> {
             ElevatedButton(
               onPressed: _addCollaborator,
               child: const Text('Add Collaborator'),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _showDeleteConfirmation,
+              child: const Text('Delete List'),
             ),
           ],
         ),
