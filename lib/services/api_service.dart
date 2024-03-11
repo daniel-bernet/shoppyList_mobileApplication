@@ -255,4 +255,23 @@ class ApiService {
 
     return response.statusCode == 200;
   }
+
+  Future<bool> deleteMultipleProductsFromShoppingList(
+      String listId, List<String> productIds) async {
+    final jwtToken = await storage.read(key: 'jwtToken');
+    if (jwtToken == null) {
+      return false;
+    }
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/shopping_lists/$listId/products/batch_delete'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $jwtToken',
+      },
+      body: jsonEncode({'product_ids': productIds}),
+    );
+
+    return response.statusCode == 200;
+  }
 }
