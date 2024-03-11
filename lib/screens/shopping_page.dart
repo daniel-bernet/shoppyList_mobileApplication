@@ -1,3 +1,4 @@
+import 'package:app/values/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../components/product_list_item.dart';
@@ -69,36 +70,26 @@ class _ShoppingPageState extends State<ShoppingPage> {
               itemBuilder: (context, index) {
                 var list = _shoppingLists![index];
                 var products = _shoppingListProducts[list['id']] ?? [];
-                return Container(
-                  margin: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    color:
-                        Colors.lightBlue[50], // Choose the shade that fits best
-                    borderRadius: BorderRadius.circular(10.0),
-                    border: Border.all(color: Colors.lightBlue.shade100),
-                  ),
+                return Card(
                   child: ExpansionTile(
-                    title: Text(list['title'],
-                        style: Theme.of(context).textTheme.titleMedium),
-                    children: products.map<Widget>((product) {
-                      return ProductListItem(
-                        productId: product['id'],
-                        productName: product['name'],
-                        quantity: product['quantity'].toString(),
-                        unit: product['unit_of_measurement'],
-                        onChecked: (isChecked) => _handleProductCheck(
-                            list['id'], product['id'], isChecked),
-                      );
-                    }).toList()
-                      ..add(
+                    title: Text(list['title'], style: Theme.of(context).textTheme.titleLarge),
+                    children: [
+                      ...products.map((product) => ProductListItem(
+                            productId: product['id'],
+                            productName: product['name'],
+                            quantity: product['quantity'].toString(),
+                            unit: product['unit_of_measurement'],
+                            onChecked: (isChecked) => _handleProductCheck(list['id'], product['id'], isChecked),
+                          )),
+                      if (products.isNotEmpty)
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: ElevatedButton(
                             onPressed: () => _finishShopping(list['id']),
                             child: const Text('Finish Shopping'),
                           ),
                         ),
-                      ),
+                    ],
                   ),
                 );
               },
