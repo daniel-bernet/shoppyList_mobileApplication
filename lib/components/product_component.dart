@@ -1,7 +1,6 @@
 import 'package:app/components/edit_product_form.dart';
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
-import '../values/app_theme.dart';
 import '../components/reusable_alert_dialog.dart';
 import '../utils/helpers/snackbar_helper.dart';
 
@@ -78,9 +77,9 @@ class ProductComponent extends StatelessWidget {
           initialUnit: unit,
           initialProductName: productName,
           onFormSubmit: (String updatedProductId, String updatedProductName, String updatedQuantity, String updatedUnit) {
-            // Here, call the API to update the product
-            // After a successful update, you may want to refresh the list or show a success message
-            // Make sure to use onEdit callback if needed to trigger any parent state update
+
+            // gotta call api edit and reload product components
+
           },
         );
       },
@@ -100,7 +99,7 @@ class ProductComponent extends StatelessWidget {
           children: <Widget>[
             IconButton(
               icon: const Icon(Icons.edit),
-              onPressed: () => _showEditDialog(context),  // Passing context here
+              onPressed: () => _showEditDialog(context),
             ),
             IconButton(
               icon: const Icon(Icons.delete),

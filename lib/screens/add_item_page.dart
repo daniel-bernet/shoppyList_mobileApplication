@@ -60,7 +60,7 @@ class _AddItemPageState extends State<AddItemPage> {
               decoration: const InputDecoration(labelText: 'Product Name'),
             ),
             const SizedBox(height: 10),
-            TextField(
+            TextField( // should only accept numbers!!!!!!!!!!!!!!!!
               controller: _quantityController,
               decoration: const InputDecoration(labelText: 'Quantity'),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),

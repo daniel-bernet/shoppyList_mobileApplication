@@ -54,10 +54,11 @@ class _EditProductFormState extends State<EditProductForm> {
             controller: _nameController,
             decoration: const InputDecoration(labelText: 'Product Name'),
           ),
+          const SizedBox(height: 10),
           TextField(
             controller: _quantityController,
             decoration: const InputDecoration(labelText: 'Quantity'),
-            keyboardType: TextInputType.numberWithOptions(decimal: true),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
           ),
           DropdownButton<String>(
             value: _selectedUnit,

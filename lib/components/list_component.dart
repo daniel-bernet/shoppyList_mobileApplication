@@ -1,8 +1,8 @@
-import 'package:app/screens/edit_list_page.dart';
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../utils/helpers/snackbar_helper.dart';
 import '../components/reusable_alert_dialog.dart';
+import '../components/edit_list_form.dart';
 
 class ListComponent extends StatelessWidget {
   final String title;
@@ -52,7 +52,7 @@ class ListComponent extends StatelessWidget {
   }
 
   void _removeSelf(BuildContext context) async {
-    Navigator.of(context).pop();  // Close the dialog
+    Navigator.of(context).pop();
     final success = await apiService.leaveListAsCollaborator(listId);
     if (success) {
       SnackbarHelper.showSnackBar('Successfully left the list', isError: false);
@@ -60,6 +60,20 @@ class ListComponent extends StatelessWidget {
     } else {
       SnackbarHelper.showSnackBar('Failed to leave the list', isError: true);
     }
+  }
+
+  void _showEditDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return EditListForm(
+          listId: listId,
+          initialListTitle: title,
+          collaborators: collaborators,
+          fetchLists: fetchLists,
+        );
+      },
+    );
   }
 
   @override
@@ -71,16 +85,7 @@ class ListComponent extends StatelessWidget {
         trailing: isOwner
             ? IconButton(
                 icon: const Icon(Icons.edit),
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => EditListPage(
-                    listId: listId,
-                    listTitle: title,
-                    createdAt: createdAt,
-                    updatedAt: updatedAt,
-                    collaborators: collaborators,
-                    onDelete: fetchLists,
-                  ),
-                )),
+                onPressed: () => _showEditDialog(context),
               )
             : IconButton(
                 icon: const Icon(Icons.exit_to_app),
