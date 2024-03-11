@@ -13,8 +13,7 @@ class ProductComponent extends StatelessWidget {
   final String creator;
   final String createdAt;
   final String lastEditedAt;
-  final VoidCallback onDelete;
-  final VoidCallback onEdit;
+  final VoidCallback onChange;
 
   const ProductComponent({
     super.key,
@@ -26,8 +25,7 @@ class ProductComponent extends StatelessWidget {
     required this.creator,
     required this.createdAt,
     required this.lastEditedAt,
-    required this.onDelete,
-    required this.onEdit,
+    required this.onChange,
   });
 
   void _deleteProduct(BuildContext context) async {
@@ -36,7 +34,7 @@ class ProductComponent extends StatelessWidget {
         await apiService.deleteProductFromShoppingList(listId, productId);
     if (success) {
       SnackbarHelper.showSnackBar('Product deleted successfully');
-      onDelete();
+      onChange();
     } else {
       SnackbarHelper.showSnackBar('Failed to delete product', isError: true);
     }
@@ -72,15 +70,15 @@ class ProductComponent extends StatelessWidget {
       context: context,
       builder: (BuildContext dialogContext) {
         return EditProductForm(
+          listId: listId,
           productId: productId,
           initialQuantity: quantity,
           initialUnit: unit,
           initialProductName: productName,
-          onFormSubmit: (String updatedProductId, String updatedProductName, String updatedQuantity, String updatedUnit) {
-
-            // gotta call api edit and reload product components
-
-          },
+          onFormSubmit: onChange,
+          creator: creator,
+          createdAt: createdAt,
+          lastEditedAt: lastEditedAt,
         );
       },
     );

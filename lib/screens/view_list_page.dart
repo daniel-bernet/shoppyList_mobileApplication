@@ -83,10 +83,7 @@ class _ViewListPageState extends State<ViewListPage> {
                         creator: product['creator'],
                         createdAt: product['created_at'],
                         lastEditedAt: product['updated_at'],
-                        onEdit: () {
-                          _fetchShoppingLists();
-                        },
-                        onDelete: () {
+                        onChange: () {
                           _fetchProductDetails(_selectedListId!);
                         },
                       );

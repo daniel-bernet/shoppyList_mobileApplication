@@ -81,7 +81,7 @@ class ListComponent extends StatelessWidget {
     return Card(
       child: ListTile(
         title: Text(title),
-        subtitle: Text('Updated at: $updatedAt'),
+        subtitle: Text('Edited at: $updatedAt'),
         trailing: isOwner
             ? IconButton(
                 icon: const Icon(Icons.edit),
