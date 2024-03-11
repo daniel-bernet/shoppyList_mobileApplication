@@ -195,4 +195,41 @@ class ApiService {
 
     return response.statusCode == 201;
   }
+
+  Future<List<dynamic>?> getProductDetails(String listId) async {
+    final jwtToken = await storage.read(key: 'jwtToken');
+    if (jwtToken == null) {
+      return null;
+    }
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/shopping_lists/$listId/products'),
+      headers: {
+        'Authorization': 'Bearer $jwtToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      return null;
+    }
+  }
+
+  Future<bool> deleteProductFromShoppingList(
+      String listId, String productId) async {
+    final jwtToken = await storage.read(key: 'jwtToken');
+    if (jwtToken == null) {
+      return false;
+    }
+
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/shopping_lists/$listId/products/$productId'),
+      headers: {
+        'Authorization': 'Bearer $jwtToken',
+      },
+    );
+
+    return response.statusCode == 200;
+  }
 }

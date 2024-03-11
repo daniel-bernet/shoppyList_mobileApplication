@@ -22,7 +22,6 @@ class _MyListsPageState extends State<MyListsPage> {
   }
 
   void _fetchLists() async {
-    print("fetching....");
     var shoppingLists = await _apiService.getShoppingLists();
     setState(() {
       _shoppingLists = shoppingLists;
@@ -58,7 +57,6 @@ class _MyListsPageState extends State<MyListsPage> {
               controller: _listTitleController,
               decoration: const InputDecoration(
                 labelText: 'List Title',
-                border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 10),
