@@ -71,6 +71,7 @@ class _LoginPageState extends State<LoginPage> {
     final bool isValidToken = await apiService.validateToken();
     if (isValidToken) {
       SnackbarHelper.showSnackBar(AppStrings.loggedIn);
+      if (!mounted) return;
       Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => const MainPage(),
       ));
@@ -84,6 +85,8 @@ class _LoginPageState extends State<LoginPage> {
         emailController.text.trim(),
         passwordController.text.trim(),
       );
+
+      if (!mounted) return;
 
       if (success) {
         SnackbarHelper.showSnackBar(AppStrings.loggedIn);
@@ -168,10 +171,6 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       );
                     },
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text(AppStrings.forgotPassword),
                   ),
                   const SizedBox(height: 20),
                   ValueListenableBuilder(

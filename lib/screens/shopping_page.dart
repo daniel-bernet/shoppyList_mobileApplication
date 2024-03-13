@@ -1,7 +1,6 @@
-import 'package:app/values/app_colors.dart';
+import 'package:app/components/product_list_component.dart';
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
-import '../components/product_list_item.dart';
 
 class ShoppingPage extends StatefulWidget {
   const ShoppingPage({super.key});
@@ -13,8 +12,8 @@ class ShoppingPage extends StatefulWidget {
 class _ShoppingPageState extends State<ShoppingPage> {
   final ApiService _apiService = ApiService();
   List<dynamic>? _shoppingLists;
-  Map<String, List<dynamic>> _shoppingListProducts = {};
-  Map<String, List<String>> _checkedProducts = {};
+  final Map<String, List<dynamic>> _shoppingListProducts = {};
+  final Map<String, List<String>> _checkedProducts = {};
 
   @override
   void initState() {
@@ -42,24 +41,6 @@ class _ShoppingPageState extends State<ShoppingPage> {
     });
   }
 
-  void _finishShopping(String listId) async {
-    if (_checkedProducts[listId]?.isNotEmpty == true) {
-      await _apiService.deleteMultipleProductsFromShoppingList(
-          listId, _checkedProducts[listId]!);
-      _fetchProductDetails(listId); // Refresh the products for this list
-    }
-  }
-
-  void _handleProductCheck(String listId, String productId, bool isChecked) {
-    setState(() {
-      if (isChecked) {
-        _checkedProducts[listId]?.add(productId);
-      } else {
-        _checkedProducts[listId]?.remove(productId);
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,29 +50,13 @@ class _ShoppingPageState extends State<ShoppingPage> {
               itemCount: _shoppingLists!.length,
               itemBuilder: (context, index) {
                 var list = _shoppingLists![index];
-                var products = _shoppingListProducts[list['id']] ?? [];
-                return Card(
-                  child: ExpansionTile(
-                    title: Text(list['title'], style: Theme.of(context).textTheme.titleLarge),
-                    children: [
-                      ...products.map((product) => ProductListItem(
-                            productId: product['id'],
-                            productName: product['name'],
-                            quantity: product['quantity'].toString(),
-                            unit: product['unit_of_measurement'],
-                            onChecked: (isChecked) => _handleProductCheck(list['id'], product['id'], isChecked),
-                          )),
-                      if (products.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: ElevatedButton(
-                            onPressed: () => _finishShopping(list['id']),
-                            child: const Text('Finish Shopping'),
-                          ),
-                        ),
-                    ],
-                  ),
-                );
+                return (_shoppingListProducts[list['id']] ?? []).isNotEmpty
+                ? ProductList(
+                    listId: list['id'],
+                    title: list['title'],
+                    products: _shoppingListProducts[list['id']] ?? [],
+                  )
+                : const SizedBox.shrink();
               },
             ),
     );

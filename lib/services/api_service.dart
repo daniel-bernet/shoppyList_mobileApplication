@@ -15,8 +15,9 @@ class ApiService {
 
     if (response.statusCode == 200) {
       await storage.deleteAll();
-      final jwtToken = jsonDecode(response.body)['access_token'];
-      await storage.write(key: 'jwtToken', value: jwtToken);
+      final tokens = jsonDecode(response.body);
+      await storage.write(key: 'jwtToken', value: tokens['access_token']);
+      await storage.write(key: 'refreshToken', value: tokens['refresh_token']);
       return true;
     } else {
       return false;
@@ -36,46 +37,83 @@ class ApiService {
 
     if (response.statusCode == 201) {
       await storage.deleteAll();
-      final jwtToken = jsonDecode(response.body)['access_token'];
-      await storage.write(key: 'jwtToken', value: jwtToken);
+      final tokens = jsonDecode(response.body);
+      await storage.write(key: 'jwtToken', value: tokens['access_token']);
+      await storage.write(key: 'refreshToken', value: tokens['refresh_token']);
       return true;
     } else {
       return false;
     }
   }
 
+  Future<bool> refreshToken() async {
+    final refreshToken = await storage.read(key: 'refreshToken');
+    if (refreshToken == null) {
+      await logOut();
+      return false;
+    }
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/token/refresh'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $refreshToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final newJwtToken = jsonDecode(response.body)['access_token'];
+      await storage.write(key: 'jwtToken', value: newJwtToken);
+      return true;
+    } else {
+      await logOut();
+      return false;
+    }
+  }
+
   Future<bool> validateToken() async {
-    final jwtToken = await storage.read(key: 'jwtToken');
+    var jwtToken = await storage.read(key: 'jwtToken');
     if (jwtToken == null) {
       return false;
     }
 
-    final response = await http.get(
+    var response = await http.get(
       Uri.parse('$_baseUrl/validate-token'),
       headers: {
         'Authorization': 'Bearer $jwtToken',
       },
     );
 
-    if (response.statusCode != 200) {
-      await storage.deleteAll();
-      return false;
+    if (response.statusCode == 401) {
+      final refreshSuccess = await refreshToken();
+      if (!refreshSuccess) {
+        return false;
+      }
+
+      jwtToken = await storage.read(key: 'jwtToken');
+      response = await http.get(
+        Uri.parse('$_baseUrl/validate-token'),
+        headers: {
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
     }
 
-    return true;
+    return response.statusCode == 200;
   }
 
   Future<void> logOut() async {
-    await storage.deleteAll();
+    await storage
+        .deleteAll(); // implement navigation to log in page!!!!!!!!!!!! securityyy
   }
 
   Future<bool> createShoppingList(String title) async {
-    final jwtToken = await storage.read(key: 'jwtToken');
+    String? jwtToken = await storage.read(key: 'jwtToken');
     if (jwtToken == null) {
       return false;
     }
 
-    final response = await http.post(
+    var response = await http.post(
       Uri.parse('$_baseUrl/shopping_lists'),
       headers: {
         'Content-Type': 'application/json',
@@ -84,21 +122,53 @@ class ApiService {
       body: jsonEncode({'title': title}),
     );
 
+    if (response.statusCode == 401) {
+      final refreshSuccess = await refreshToken();
+      if (!refreshSuccess) {
+        return false;
+      }
+
+      jwtToken = await storage.read(key: 'jwtToken');
+      response = await http.post(
+        Uri.parse('$_baseUrl/shopping_lists'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+        body: jsonEncode({'title': title}),
+      );
+    }
+
     return response.statusCode == 201;
   }
 
   Future<List<dynamic>?> getShoppingLists() async {
-    final jwtToken = await storage.read(key: 'jwtToken');
+    String? jwtToken = await storage.read(key: 'jwtToken');
     if (jwtToken == null) {
       return null;
     }
 
-    final response = await http.get(
+    var response = await http.get(
       Uri.parse('$_baseUrl/shopping_lists'),
       headers: {
         'Authorization': 'Bearer $jwtToken',
       },
     );
+
+    if (response.statusCode == 401) {
+      final refreshSuccess = await refreshToken();
+      if (!refreshSuccess) {
+        return null;
+      }
+
+      jwtToken = await storage.read(key: 'jwtToken');
+      response = await http.get(
+        Uri.parse('$_baseUrl/shopping_lists'),
+        headers: {
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+    }
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -108,12 +178,12 @@ class ApiService {
   }
 
   Future<bool> addCollaborator(String listId, String email) async {
-    final jwtToken = await storage.read(key: 'jwtToken');
+    String? jwtToken = await storage.read(key: 'jwtToken');
     if (jwtToken == null) {
       return false;
     }
 
-    final response = await http.post(
+    var response = await http.post(
       Uri.parse('$_baseUrl/shopping_lists/$listId/collaborators'),
       headers: {
         'Content-Type': 'application/json',
@@ -122,65 +192,127 @@ class ApiService {
       body: jsonEncode({'email': email}),
     );
 
+    if (response.statusCode == 401) {
+      final refreshSuccess = await refreshToken();
+      if (!refreshSuccess) {
+        return false;
+      }
+
+      jwtToken = await storage.read(key: 'jwtToken');
+      response = await http.post(
+        Uri.parse('$_baseUrl/shopping_lists/$listId/collaborators'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+        body: jsonEncode({'email': email}),
+      );
+    }
+
     return response.statusCode == 200;
   }
 
   Future<bool> removeCollaborator(String listId, String email) async {
-    final jwtToken = await storage.read(key: 'jwtToken');
+    String? jwtToken = await storage.read(key: 'jwtToken');
     if (jwtToken == null) {
       return false;
     }
 
-    final response = await http.delete(
+    var response = await http.delete(
       Uri.parse('$_baseUrl/shopping_lists/$listId/collaborators/$email'),
       headers: {
         'Authorization': 'Bearer $jwtToken',
       },
     );
 
+    if (response.statusCode == 401) {
+      final refreshSuccess = await refreshToken();
+      if (!refreshSuccess) {
+        return false;
+      }
+
+      jwtToken = await storage.read(key: 'jwtToken');
+      response = await http.delete(
+        Uri.parse('$_baseUrl/shopping_lists/$listId/collaborators/$email'),
+        headers: {
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+    }
+
     return response.statusCode == 200;
   }
 
   Future<bool> leaveListAsCollaborator(String listId) async {
-    final jwtToken = await storage.read(key: 'jwtToken');
+    String? jwtToken = await storage.read(key: 'jwtToken');
     if (jwtToken == null) {
       return false;
     }
 
-    final response = await http.post(
+    var response = await http.post(
       Uri.parse('$_baseUrl/shopping_lists/$listId/leave'),
       headers: {
         'Authorization': 'Bearer $jwtToken',
       },
     );
 
+    if (response.statusCode == 401) {
+      final refreshSuccess = await refreshToken();
+      if (!refreshSuccess) {
+        return false;
+      }
+
+      jwtToken = await storage.read(key: 'jwtToken');
+      response = await http.post(
+        Uri.parse('$_baseUrl/shopping_lists/$listId/leave'),
+        headers: {
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+    }
+
     return response.statusCode == 200;
   }
 
   Future<bool> deleteShoppingList(String listId) async {
-    final jwtToken = await storage.read(key: 'jwtToken');
+    String? jwtToken = await storage.read(key: 'jwtToken');
     if (jwtToken == null) {
       return false;
     }
 
-    final response = await http.delete(
+    var response = await http.delete(
       Uri.parse('$_baseUrl/shopping_lists/$listId'),
       headers: {
         'Authorization': 'Bearer $jwtToken',
       },
     );
 
+    if (response.statusCode == 401) {
+      final refreshSuccess = await refreshToken();
+      if (!refreshSuccess) {
+        return false;
+      }
+
+      jwtToken = await storage.read(key: 'jwtToken');
+      response = await http.delete(
+        Uri.parse('$_baseUrl/shopping_lists/$listId'),
+        headers: {
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+    }
+
     return response.statusCode == 200;
   }
 
   Future<bool> addProductToShoppingList(String listId, String name,
       String quantity, String unitOfMeasurement) async {
-    final jwtToken = await storage.read(key: 'jwtToken');
+    String? jwtToken = await storage.read(key: 'jwtToken');
     if (jwtToken == null) {
       return false;
     }
 
-    final response = await http.post(
+    var response = await http.post(
       Uri.parse('$_baseUrl/shopping_lists/$listId/products'),
       headers: {
         'Content-Type': 'application/json',
@@ -193,21 +325,57 @@ class ApiService {
       }),
     );
 
+    if (response.statusCode == 401) {
+      final refreshSuccess = await refreshToken();
+      if (!refreshSuccess) {
+        return false;
+      }
+
+      jwtToken = await storage.read(key: 'jwtToken');
+      response = await http.post(
+        Uri.parse('$_baseUrl/shopping_lists/$listId/products'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+        body: jsonEncode({
+          'name': name,
+          'quantity': quantity,
+          'unit_of_measurement': unitOfMeasurement,
+        }),
+      );
+    }
+
     return response.statusCode == 201;
   }
 
   Future<List<dynamic>?> getProductDetails(String listId) async {
-    final jwtToken = await storage.read(key: 'jwtToken');
+    String? jwtToken = await storage.read(key: 'jwtToken');
     if (jwtToken == null) {
       return null;
     }
 
-    final response = await http.get(
+    var response = await http.get(
       Uri.parse('$_baseUrl/shopping_lists/$listId/products'),
       headers: {
         'Authorization': 'Bearer $jwtToken',
       },
     );
+
+    if (response.statusCode == 401) {
+      final refreshSuccess = await refreshToken();
+      if (!refreshSuccess) {
+        return null;
+      }
+
+      jwtToken = await storage.read(key: 'jwtToken');
+      response = await http.get(
+        Uri.parse('$_baseUrl/shopping_lists/$listId/products'),
+        headers: {
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+    }
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
@@ -218,29 +386,44 @@ class ApiService {
 
   Future<bool> deleteProductFromShoppingList(
       String listId, String productId) async {
-    final jwtToken = await storage.read(key: 'jwtToken');
+    String? jwtToken = await storage.read(key: 'jwtToken');
     if (jwtToken == null) {
       return false;
     }
 
-    final response = await http.delete(
+    var response = await http.delete(
       Uri.parse('$_baseUrl/shopping_lists/$listId/products/$productId'),
       headers: {
         'Authorization': 'Bearer $jwtToken',
       },
     );
 
+    if (response.statusCode == 401) {
+      final refreshSuccess = await refreshToken();
+      if (!refreshSuccess) {
+        return false;
+      }
+
+      jwtToken = await storage.read(key: 'jwtToken');
+      response = await http.delete(
+        Uri.parse('$_baseUrl/shopping_lists/$listId/products/$productId'),
+        headers: {
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+    }
+
     return response.statusCode == 200;
   }
 
   Future<bool> updateProductDetails(String listId, String productId,
       String name, String quantity, String unitOfMeasurement) async {
-    final jwtToken = await storage.read(key: 'jwtToken');
+    String? jwtToken = await storage.read(key: 'jwtToken');
     if (jwtToken == null) {
       return false;
     }
 
-    final response = await http.put(
+    var response = await http.put(
       Uri.parse('$_baseUrl/shopping_lists/$listId/products/$productId'),
       headers: {
         'Content-Type': 'application/json',
@@ -253,17 +436,38 @@ class ApiService {
       }),
     );
 
+    if (response.statusCode == 401) {
+      final refreshSuccess = await refreshToken();
+      if (!refreshSuccess) {
+        return false;
+      }
+
+      jwtToken = await storage.read(key: 'jwtToken');
+      response = await http.put(
+        Uri.parse('$_baseUrl/shopping_lists/$listId/products/$productId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+        body: jsonEncode({
+          'name': name,
+          'quantity': quantity,
+          'unit_of_measurement': unitOfMeasurement,
+        }),
+      );
+    }
+
     return response.statusCode == 200;
   }
 
   Future<bool> deleteMultipleProductsFromShoppingList(
       String listId, List<String> productIds) async {
-    final jwtToken = await storage.read(key: 'jwtToken');
+    String? jwtToken = await storage.read(key: 'jwtToken');
     if (jwtToken == null) {
       return false;
     }
 
-    final response = await http.post(
+    var response = await http.post(
       Uri.parse('$_baseUrl/shopping_lists/$listId/products/batch_delete'),
       headers: {
         'Content-Type': 'application/json',
@@ -272,6 +476,120 @@ class ApiService {
       body: jsonEncode({'product_ids': productIds}),
     );
 
+    if (response.statusCode == 401) {
+      final refreshSuccess = await refreshToken();
+      if (!refreshSuccess) {
+        return false;
+      }
+
+      jwtToken = await storage.read(key: 'jwtToken');
+      response = await http.post(
+        Uri.parse('$_baseUrl/shopping_lists/$listId/products/batch_delete'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+        body: jsonEncode({'product_ids': productIds}),
+      );
+    }
+
     return response.statusCode == 200;
+  }
+
+  Future<bool> changePassword(
+      String currentPassword, String newPassword) async {
+    final jwtToken = await storage.read(key: 'jwtToken');
+    if (jwtToken == null) {
+      return false;
+    }
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/change_password'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $jwtToken',
+      },
+      body: jsonEncode({
+        'current_password': currentPassword,
+        'new_password': newPassword,
+      }),
+    );
+
+    if (response.statusCode == 401) {
+      final refreshSuccess = await refreshToken();
+      if (!refreshSuccess) {
+        return false;
+      }
+      return await changePassword(currentPassword, newPassword);
+    }
+
+    return response.statusCode == 200;
+  }
+
+  Future<bool> deleteAccount() async {
+    final jwtToken = await storage.read(key: 'jwtToken');
+    if (jwtToken == null) {
+      return false;
+    }
+
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/delete_account'),
+      headers: {
+        'Authorization': 'Bearer $jwtToken',
+      },
+    );
+
+    if (response.statusCode == 401) {
+      final refreshSuccess = await refreshToken();
+      if (!refreshSuccess) {
+        return false;
+      }
+      return await deleteAccount();
+    }
+
+    // Perform local cleanup if needed (e.g., clearing local data or cache)
+    if (response.statusCode == 200) {
+      await storage.deleteAll();
+      // Implement any navigation or UI updates needed post account deletion
+    }
+
+    return response.statusCode == 200;
+  }
+
+  Future<Map<String, dynamic>?> getAccountInfo() async {
+    String? jwtToken = await storage.read(key: 'jwtToken');
+    if (jwtToken == null) {
+      return null;
+    }
+
+    var response = await http.get(
+      Uri.parse('$_baseUrl/account'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $jwtToken',
+      },
+    );
+
+    if (response.statusCode == 401) {
+      final refreshSuccess = await refreshToken();
+      if (!refreshSuccess) {
+        return null;
+      }
+
+      jwtToken = await storage.read(key: 'jwtToken');
+      response = await http.get(
+        Uri.parse('$_baseUrl/account'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+    }
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+
+    return null;
   }
 }
