@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../utils/helpers/navigation_helper.dart';
@@ -12,19 +14,43 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-  ApiService apiService = ApiService();
+  final ApiService apiService = ApiService();
+  Map<String, dynamic>? accountInfo;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAccountInfo();
+  }
+
+  void _fetchAccountInfo() async {
+    final info = await apiService.getAccountInfo();
+    if (info != null) {
+      setState(() {
+        accountInfo = info;
+      });
+    }
+  }
 
   void _logOut() async {
     await apiService.logOut();
     NavigationHelper.pushReplacementNamed(AppRoutes.login);
   }
 
+  void _changeEmail() {
+    // Placeholder for change email logic
+  }
+
+  void _changeUsername() {
+    // Placeholder for change username logic
+  }
+
   void _changePassword() {
-    // Implement later!!!!!!
+    // Navigate to Change Password Page
   }
 
   void _deleteAccount() {
-    // Implement later!!!!!!!!
+    // Navigate to Delete Account Confirmation Page
   }
 
   @override
@@ -34,12 +60,29 @@ class _UserPageState extends State<UserPage> {
     return Scaffold(
       body: ListView(
         children: [
-          SwitchListTile(
-            title: const Text(AppStrings.darkMode),
-            value: isDarkMode,
-            onChanged: (bool value) {
-              // Handle theme change.
-            },
+          if (accountInfo != null) ...[
+            ListTile(
+              title: const Text('Username'),
+              subtitle: Text(accountInfo!['username'] ?? 'N/A'),
+            ),
+            ListTile(
+              title: const Text('Email'),
+              subtitle: Text(accountInfo!['email'] ?? 'N/A'),
+            ),
+            ListTile(
+              title: const Text('Registered On'),
+              subtitle: Text(accountInfo!['registered_on'] ?? 'N/A'),
+            ),
+          ],
+          ListTile(
+            trailing: const Icon(Icons.email),
+            title: const Text(AppStrings.changeEmail),
+            onTap: _changeEmail,
+          ),
+          ListTile(
+            trailing: const Icon(Icons.person),
+            title: const Text(AppStrings.changeUsername),
+            onTap: _changeUsername,
           ),
           ListTile(
             trailing: const Icon(Icons.logout),
@@ -55,6 +98,13 @@ class _UserPageState extends State<UserPage> {
             trailing: const Icon(Icons.delete),
             title: const Text(AppStrings.deleteAccount),
             onTap: _deleteAccount,
+          ),
+          SwitchListTile(
+            title: const Text(AppStrings.darkMode),
+            value: isDarkMode,
+            onChanged: (bool value) {
+              // Handle theme change.
+            },
           ),
         ],
       ),

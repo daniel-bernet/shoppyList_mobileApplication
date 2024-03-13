@@ -42,4 +42,6 @@ class AppStrings {
   static const String deleteAccount = 'Delete Account';
   static const String changePassword = 'Change Password';
   static const String errorOccurred = 'An error occurred. Please try again.';
+  static const String changeEmail = 'Change E-Mail';
+  static const String changeUsername = 'Edit Username';
 }
