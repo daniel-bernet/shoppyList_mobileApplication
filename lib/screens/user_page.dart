@@ -1,3 +1,5 @@
+import 'package:app/utils/helpers/snackbar_helper.dart';
+import 'package:app/values/app_regex.dart';
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../utils/helpers/navigation_helper.dart';
@@ -31,24 +33,325 @@ class _UserPageState extends State<UserPage> {
   }
 
   void _logOut() async {
-    await apiService.logOut();
-    NavigationHelper.pushReplacementNamed(AppRoutes.login);
+    final confirmLogout = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Log Out'),
+          content: const Text('Are you sure you want to log out?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Log Out'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmLogout == true) {
+      await apiService.logOut();
+    }
   }
 
   void _changeEmail() {
-    // Placeholder for change email logic
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final TextEditingController _newEmailController =
+            TextEditingController();
+        final TextEditingController _currentPasswordController =
+            TextEditingController();
+        final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+        return AlertDialog(
+          title: const Text(AppStrings.changeEmail),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextFormField(
+                  controller: _newEmailController,
+                  decoration: const InputDecoration(hintText: "New Email"),
+                  validator: (value) {
+                    if (value == null ||
+                        value.isEmpty ||
+                        !value.contains('@')) {
+                      return 'Please enter a valid email';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: _currentPasswordController,
+                  decoration:
+                      const InputDecoration(hintText: "Current Password"),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your current password';
+                    }
+                    return null;
+                  },
+                  obscureText: true,
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(AppStrings.cancel),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text(AppStrings.submit),
+              onPressed: () async {
+                if (_formKey.currentState!.validate()) {
+                  bool success = await apiService.editEmail(
+                    _newEmailController.text.trim(),
+                    _currentPasswordController.text.trim(),
+                  );
+
+                  if (success) {
+                    Navigator.of(context).pop();
+                    _fetchAccountInfo(); // Refresh account information
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(AppStrings.emailChangedSuccess)),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(AppStrings.emailChangedFailure)),
+                    );
+                  }
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _changeUsername() {
-    // Placeholder for change username logic
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final TextEditingController _newUsernameController =
+            TextEditingController();
+        final TextEditingController _currentPasswordController =
+            TextEditingController();
+        final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+        return AlertDialog(
+          title: const Text(AppStrings.changeUsername),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextFormField(
+                  controller: _newUsernameController,
+                  decoration: const InputDecoration(hintText: "New Username"),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a valid username';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: _currentPasswordController,
+                  decoration:
+                      const InputDecoration(hintText: "Current Password"),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your current password';
+                    }
+                    return null;
+                  },
+                  obscureText: true,
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(AppStrings.cancel),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text(AppStrings.submit),
+              onPressed: () async {
+                if (_formKey.currentState!.validate()) {
+                  bool success = await apiService.editUsername(
+                    _newUsernameController.text.trim(),
+                    _currentPasswordController.text.trim(),
+                  );
+
+                  if (success) {
+                    Navigator.of(context).pop();
+                    _fetchAccountInfo(); // Refresh account information
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text(AppStrings.usernameChangedSuccess)),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text(AppStrings.usernameChangedFailure)),
+                    );
+                  }
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _changePassword() {
-    // Navigate to Change Password Page
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final TextEditingController _currentPasswordController =
+            TextEditingController();
+        final TextEditingController _newPasswordController =
+            TextEditingController();
+        final TextEditingController _confirmNewPasswordController =
+            TextEditingController();
+        final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+        return AlertDialog(
+          title: const Text(AppStrings.changePassword),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextFormField(
+                  controller: _currentPasswordController,
+                  decoration:
+                      const InputDecoration(hintText: "Current Password"),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your current password';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: _newPasswordController,
+                  decoration: const InputDecoration(hintText: "New Password"),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your new password';
+                    }
+                    if (!AppRegex.passwordRegex.hasMatch(value)) {
+                      return 'Your password does not meet the requirements';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: _confirmNewPasswordController,
+                  decoration:
+                      const InputDecoration(hintText: "Confirm New Password"),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null ||
+                        value.isEmpty ||
+                        value != _newPasswordController.text) {
+                      return 'The password confirmation does not match';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(AppStrings.cancel),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text(AppStrings.submit),
+              onPressed: () async {
+                if (_formKey.currentState!.validate()) {
+                  bool success = await apiService.changePassword(
+                    _currentPasswordController.text.trim(),
+                    _newPasswordController.text.trim(),
+                  );
+
+                  if (success) {
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text(AppStrings.passwordChangedSuccess)),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Text(AppStrings.passwordChangedFailure)),
+                    );
+                  }
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
-  void _deleteAccount() {
-    // Navigate to Delete Account Confirmation Page
+  void _deleteAccount() async {
+    final confirmDeletion = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Account'),
+          content: const Text(
+              'Are you sure you want to delete your account? This action cannot be undone\n\nAll information, lists and products associated with this account will be removed.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmDeletion == true) {
+      final success = await apiService.deleteAccount();
+      if (success) {
+        SnackbarHelper.showSnackBar('Account deleted successfully.');
+        NavigationHelper.pushReplacementNamed(AppRoutes.login);
+      } else {
+        SnackbarHelper.showSnackBar('Failed to delete account.', isError: true);
+      }
+    }
   }
 
   @override

@@ -44,4 +44,12 @@ class AppStrings {
   static const String errorOccurred = 'An error occurred. Please try again.';
   static const String changeEmail = 'Change E-Mail';
   static const String changeUsername = 'Edit Username';
+  static const String cancel = 'Cancel';
+  static const String submit = 'Submit';
+  static const String emailChangedSuccess = 'Changed Email successfully';
+  static const String emailChangedFailure = 'Failed to change Email';
+  static const String usernameChangedSuccess = 'Changed Username successfully';
+  static const String usernameChangedFailure = 'Failed to change Username';
+  static const String passwordChangedSuccess = 'Changed Password successfully';
+  static const String passwordChangedFailure = 'Failed to change Password';
 }

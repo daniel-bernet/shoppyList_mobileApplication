@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:app/utils/helpers/navigation_helper.dart';
+import 'package:app/values/app_routes.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -104,7 +106,8 @@ class ApiService {
 
   Future<void> logOut() async {
     await storage
-        .deleteAll(); // implement navigation to log in page!!!!!!!!!!!! securityyy
+        .deleteAll();
+    NavigationHelper.pushReplacementNamed(AppRoutes.login);
   }
 
   Future<bool> createShoppingList(String title) async {
@@ -547,10 +550,9 @@ class ApiService {
       return await deleteAccount();
     }
 
-    // Perform local cleanup if needed (e.g., clearing local data or cache)
     if (response.statusCode == 200) {
       await storage.deleteAll();
-      // Implement any navigation or UI updates needed post account deletion
+      NavigationHelper.pushReplacementNamed(AppRoutes.login);
     }
 
     return response.statusCode == 200;
@@ -591,5 +593,87 @@ class ApiService {
     }
 
     return null;
+  }
+
+  Future<bool> editUsername(String newUsername, String currentPassword) async {
+    String? jwtToken = await storage.read(key: 'jwtToken');
+    if (jwtToken == null) {
+      return false;
+    }
+
+    var response = await http.post(
+      Uri.parse('$_baseUrl/edit_username'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $jwtToken',
+      },
+      body: jsonEncode({
+        'new_username': newUsername,
+        'current_password': currentPassword,
+      }),
+    );
+
+    if (response.statusCode == 401) {
+      final refreshSuccess = await refreshToken();
+      if (!refreshSuccess) {
+        return false;
+      }
+
+      jwtToken = await storage.read(key: 'jwtToken');
+      response = await http.post(
+        Uri.parse('$_baseUrl/edit_username'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+        body: jsonEncode({
+          'new_username': newUsername,
+          'current_password': currentPassword,
+        }),
+      );
+    }
+
+    return response.statusCode == 200;
+  }
+
+  Future<bool> editEmail(String newEmail, String currentPassword) async {
+    String? jwtToken = await storage.read(key: 'jwtToken');
+    if (jwtToken == null) {
+      return false;
+    }
+
+    var response = await http.post(
+      Uri.parse('$_baseUrl/edit_email'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $jwtToken',
+      },
+      body: jsonEncode({
+        'new_email': newEmail,
+        'current_password': currentPassword,
+      }),
+    );
+
+    if (response.statusCode == 401) {
+      final refreshSuccess = await refreshToken();
+      if (!refreshSuccess) {
+        return false;
+      }
+
+      jwtToken = await storage.read(key: 'jwtToken');
+      response = await http.post(
+        Uri.parse('$_baseUrl/edit_email'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+        body: jsonEncode({
+          'new_email': newEmail,
+          'current_password': currentPassword,
+        }),
+      );
+    }
+
+    return response.statusCode == 200;
   }
 }
