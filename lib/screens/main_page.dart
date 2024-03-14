@@ -1,5 +1,5 @@
+import 'package:app/components/bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:app/utils/theme/app_colors.dart';
 import 'package:app/components/custom_app_bar.dart';
 import 'shopping_page.dart';
 import 'add_item_page.dart';
@@ -25,14 +25,6 @@ class _MainPageState extends State<MainPage> {
     const UserPage(),
   ];
 
-  final List<String> _pageTitles = [
-    'Shopping',
-    'Add Item',
-    'View List',
-    'My Lists',
-    'User',
-  ];
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -42,40 +34,16 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
-        pageTitle: _pageTitles[_selectedIndex],
+      appBar: const CustomAppBar(
+        pageTitle: 'Page Title', 
       ),
       body: IndexedStack(
         index: _selectedIndex,
         children: _pageOptions,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'Shopping',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_box),
-            label: 'Add Item',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.view_list),
-            label: 'View List',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'My Lists',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'User',
-          ),
-        ],
+      bottomNavigationBar: CustomBottomNavigationBar(
         currentIndex: _selectedIndex,
-        selectedItemColor: AppColors.lightPrimaryColor,
-        unselectedItemColor: AppColors.lightSecondaryColor,
-        onTap: _onItemTapped,
+        onIndexSelected: _onItemTapped,
       ),
     );
   }
