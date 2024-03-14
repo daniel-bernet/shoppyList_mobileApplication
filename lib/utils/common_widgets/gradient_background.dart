@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../values/app_colors.dart';
-import '../extensions.dart';
+import '../theme/app_colors.dart';
 
 class GradientBackground extends StatelessWidget {
   final List<Widget> children;
@@ -22,7 +21,7 @@ class GradientBackground extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(height: context.heightFraction(sizeFraction: 0.1)),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.1),
             ...children,
           ],
         ),

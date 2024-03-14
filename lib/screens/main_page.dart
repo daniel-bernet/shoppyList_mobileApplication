@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:app/values/app_colors.dart';
+import 'package:app/utils/theme/app_colors.dart';
 import 'package:app/components/custom_app_bar.dart';
 import 'shopping_page.dart';
 import 'add_item_page.dart';

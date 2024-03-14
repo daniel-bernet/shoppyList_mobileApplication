@@ -1,4 +1,4 @@
-import 'package:app/values/app_colors.dart';
+import 'package:app/utils/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -16,7 +16,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       title: Text(
         pageTitle,
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(color:AppColors.lightOnPrimaryColor) // Optional specification for visibility.
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(color:AppColors.lightOnPrimaryColor)
       ),
       centerTitle: true,
       backgroundColor: Theme.of(context).colorScheme.primary,

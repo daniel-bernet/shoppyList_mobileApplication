@@ -1,6 +1,8 @@
 import 'package:app/utils/helpers/snackbar_helper.dart';
+import 'package:app/utils/theme/theme_provider.dart';
 import 'package:app/values/app_regex.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../services/api_service.dart';
 import '../utils/helpers/navigation_helper.dart';
 import '../values/app_strings.dart';
@@ -404,7 +406,9 @@ class _UserPageState extends State<UserPage> {
             title: const Text(AppStrings.darkMode),
             value: isDarkMode,
             onChanged: (bool value) {
-              // Handle theme change.
+              final themeProvider =
+                  Provider.of<ThemeProvider>(context, listen: false);
+              themeProvider.toggleTheme();
             },
           ),
         ],
