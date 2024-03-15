@@ -1,4 +1,8 @@
+import 'package:app/providers/timezone_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:timezone/timezone.dart' as tz;
 import '../services/api_service.dart';
 import '../utils/helpers/snackbar_helper.dart';
 
@@ -35,6 +39,19 @@ class _EditProductFormState extends State<EditProductForm> {
   late TextEditingController _quantityController;
   String? _selectedUnit;
   final ApiService _apiService = ApiService();
+
+  String _formatDateTime(String dateTimeStr, BuildContext context) {
+    final timezoneProvider =
+        Provider.of<TimezoneProvider>(context, listen: false);
+    final String timezoneId = timezoneProvider.timezone;
+
+    final DateFormat formatter = DateFormat('dd.MM.yyyy HH:mm');
+    final location = tz.getLocation(timezoneId);
+    final DateTime dateTime = DateTime.parse(dateTimeStr);
+    final tz.TZDateTime zonedTime = tz.TZDateTime.from(dateTime, location);
+
+    return formatter.format(zonedTime);
+  }
 
   @override
   void initState() {
@@ -76,7 +93,8 @@ class _EditProductFormState extends State<EditProductForm> {
             const SizedBox(height: 10),
             TextField(
               controller: _quantityController,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               decoration: const InputDecoration(labelText: 'Quantity'),
             ),
             const SizedBox(height: 10),
@@ -97,8 +115,8 @@ class _EditProductFormState extends State<EditProductForm> {
             ),
             const SizedBox(height: 10),
             Text('Creator: ${widget.creator}'),
-            Text('Created at: ${widget.createdAt}'),
-            Text('Last edited at: ${widget.lastEditedAt}'),
+            Text('Created at: ${_formatDateTime(widget.createdAt, context)}'),
+            Text('Last edit: ${_formatDateTime(widget.lastEditedAt, context)}'),
           ],
         ),
       ),

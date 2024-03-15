@@ -7,8 +7,8 @@ import '../components/edit_list_form.dart';
 class ListComponent extends StatelessWidget {
   final String title;
   final String listId;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final String createdAt;
+  final String updatedAt;
   final List<String> collaborators;
   final bool isOwner;
   final VoidCallback fetchLists;
@@ -81,7 +81,7 @@ class ListComponent extends StatelessWidget {
     return Card(
       child: ListTile(
         title: Text(title),
-        subtitle: Text('Edited at: $updatedAt'),
+        subtitle: Text('Last edit: $updatedAt'),
         trailing: isOwner
             ? IconButton(
                 icon: const Icon(Icons.edit),

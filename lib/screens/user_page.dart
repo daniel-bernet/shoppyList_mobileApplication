@@ -1,12 +1,18 @@
+import 'package:app/providers/timezone_provider.dart';
 import 'package:app/utils/helpers/snackbar_helper.dart';
-import 'package:app/utils/theme/theme_provider.dart';
+import 'package:app/providers/theme_provider.dart';
 import 'package:app/values/app_regex.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../services/api_service.dart';
 import '../utils/helpers/navigation_helper.dart';
 import '../values/app_strings.dart';
 import '../values/app_routes.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:shared_preferences/shared_preferences.dart';
+import '../providers/timezone_provider.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});
@@ -18,11 +24,32 @@ class UserPage extends StatefulWidget {
 class _UserPageState extends State<UserPage> {
   final ApiService apiService = ApiService();
   Map<String, dynamic>? accountInfo;
+  String? selectedTimezone;
+
+  final List<String> timezones = [
+    'Pacific/Honolulu',
+    'America/Anchorage',
+    'America/Los_Angeles',
+    'America/Denver',
+    'America/Chicago',
+    'America/New_York',
+    'America/Argentina/Buenos_Aires',
+    'Atlantic/Reykjavik',
+    'Europe/London',
+    'Europe/Berlin',
+    'Europe/Athens',
+    'Asia/Dubai',
+    'Asia/Kolkata',
+    'Asia/Shanghai',
+    'Asia/Tokyo',
+    'Australia/Sydney',
+  ];
 
   @override
   void initState() {
     super.initState();
     _fetchAccountInfo();
+    _loadTimezonePreference();
   }
 
   void _fetchAccountInfo() async {
@@ -125,11 +152,13 @@ class _UserPageState extends State<UserPage> {
                     Navigator.of(context).pop();
                     _fetchAccountInfo(); // Refresh account information
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(AppStrings.emailChangedSuccess)),
+                      const SnackBar(
+                          content: Text(AppStrings.emailChangedSuccess)),
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(AppStrings.emailChangedFailure)),
+                      const SnackBar(
+                          content: Text(AppStrings.emailChangedFailure)),
                     );
                   }
                 }
@@ -145,21 +174,21 @@ class _UserPageState extends State<UserPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        final TextEditingController _newUsernameController =
+        final TextEditingController newUsernameController =
             TextEditingController();
-        final TextEditingController _currentPasswordController =
+        final TextEditingController currentPasswordController =
             TextEditingController();
-        final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+        final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
         return AlertDialog(
           title: const Text(AppStrings.changeUsername),
           content: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 TextFormField(
-                  controller: _newUsernameController,
+                  controller: newUsernameController,
                   decoration: const InputDecoration(hintText: "New Username"),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -170,7 +199,7 @@ class _UserPageState extends State<UserPage> {
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
-                  controller: _currentPasswordController,
+                  controller: currentPasswordController,
                   decoration:
                       const InputDecoration(hintText: "Current Password"),
                   validator: (value) {
@@ -194,22 +223,22 @@ class _UserPageState extends State<UserPage> {
             TextButton(
               child: const Text(AppStrings.submit),
               onPressed: () async {
-                if (_formKey.currentState!.validate()) {
+                if (formKey.currentState!.validate()) {
                   bool success = await apiService.editUsername(
-                    _newUsernameController.text.trim(),
-                    _currentPasswordController.text.trim(),
+                    newUsernameController.text.trim(),
+                    currentPasswordController.text.trim(),
                   );
 
                   if (success) {
                     Navigator.of(context).pop();
-                    _fetchAccountInfo(); // Refresh account information
+                    _fetchAccountInfo();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                           content: Text(AppStrings.usernameChangedSuccess)),
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                           content: Text(AppStrings.usernameChangedFailure)),
                     );
                   }
@@ -226,23 +255,23 @@ class _UserPageState extends State<UserPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        final TextEditingController _currentPasswordController =
+        final TextEditingController currentPasswordController =
             TextEditingController();
-        final TextEditingController _newPasswordController =
+        final TextEditingController newPasswordController =
             TextEditingController();
-        final TextEditingController _confirmNewPasswordController =
+        final TextEditingController confirmNewPasswordController =
             TextEditingController();
-        final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+        final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
         return AlertDialog(
           title: const Text(AppStrings.changePassword),
           content: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 TextFormField(
-                  controller: _currentPasswordController,
+                  controller: currentPasswordController,
                   decoration:
                       const InputDecoration(hintText: "Current Password"),
                   obscureText: true,
@@ -255,7 +284,7 @@ class _UserPageState extends State<UserPage> {
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
-                  controller: _newPasswordController,
+                  controller: newPasswordController,
                   decoration: const InputDecoration(hintText: "New Password"),
                   obscureText: true,
                   validator: (value) {
@@ -270,14 +299,14 @@ class _UserPageState extends State<UserPage> {
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
-                  controller: _confirmNewPasswordController,
+                  controller: confirmNewPasswordController,
                   decoration:
                       const InputDecoration(hintText: "Confirm New Password"),
                   obscureText: true,
                   validator: (value) {
                     if (value == null ||
                         value.isEmpty ||
-                        value != _newPasswordController.text) {
+                        value != newPasswordController.text) {
                       return 'The password confirmation does not match';
                     }
                     return null;
@@ -296,21 +325,21 @@ class _UserPageState extends State<UserPage> {
             TextButton(
               child: const Text(AppStrings.submit),
               onPressed: () async {
-                if (_formKey.currentState!.validate()) {
+                if (formKey.currentState!.validate()) {
                   bool success = await apiService.changePassword(
-                    _currentPasswordController.text.trim(),
-                    _newPasswordController.text.trim(),
+                    currentPasswordController.text.trim(),
+                    newPasswordController.text.trim(),
                   );
 
                   if (success) {
                     Navigator.of(context).pop();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                           content: Text(AppStrings.passwordChangedSuccess)),
                     );
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                           content: Text(AppStrings.passwordChangedFailure)),
                     );
                   }
@@ -356,9 +385,34 @@ class _UserPageState extends State<UserPage> {
     }
   }
 
+  Future<void> _loadTimezonePreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? savedTimezone = prefs.getString('selectedTimezone');
+    final provider = Provider.of<TimezoneProvider>(context, listen: false);
+    provider.setTimezone(savedTimezone ?? 'UTC');
+  }
+
+  Future<void> _saveTimezonePreference(String timezone) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selectedTimezone', timezone);
+    final provider = Provider.of<TimezoneProvider>(context, listen: false);
+    provider.setTimezone(timezone);
+  }
+
+  String _formatRegisteredOn(String? registeredOn, String timezone) {
+    if (registeredOn == null) return 'N/A';
+
+    final initialDate = DateTime.parse(registeredOn).toUtc();
+    final location = tz.getLocation(timezone);
+    final localDate = tz.TZDateTime.from(initialDate, location);
+
+    return DateFormat('dd.MM.yyyy HH:mm').format(localDate);
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final timezoneProvider = Provider.of<TimezoneProvider>(context);
 
     return Scaffold(
       body: ListView(
@@ -374,7 +428,9 @@ class _UserPageState extends State<UserPage> {
             ),
             ListTile(
               title: const Text('Registered On'),
-              subtitle: Text(accountInfo!['registered_on'] ?? 'N/A'),
+              subtitle:
+                  Text(_formatRegisteredOn(
+                accountInfo?['registered_on'], timezoneProvider.timezone)),
             ),
           ],
           ListTile(
@@ -410,6 +466,25 @@ class _UserPageState extends State<UserPage> {
                   Provider.of<ThemeProvider>(context, listen: false);
               themeProvider.toggleTheme();
             },
+          ),
+          ListTile(
+            title: const Text('Timezone'),
+            trailing: DropdownButton<String>(
+              value: selectedTimezone,
+              onChanged: (String? newValue) async {
+                setState(() {
+                  selectedTimezone = newValue;
+                  tz.setLocalLocation(tz.getLocation(newValue!));
+                });
+                await _saveTimezonePreference(newValue!);
+              },
+              items: timezones.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
           ),
         ],
       ),

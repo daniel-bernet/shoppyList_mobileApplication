@@ -1,3 +1,4 @@
+import 'package:app/providers/timezone_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -8,8 +9,11 @@ import 'providers/shopping_list_provider.dart';
 import 'values/app_routes.dart';
 import 'values/app_strings.dart';
 import 'routes.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 void main() {
+  tz.initializeTimeZones();
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(statusBarIconBrightness: Brightness.light),
@@ -28,6 +32,7 @@ class ShoppyListApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => ShoppingListProvider()),
+        ChangeNotifierProvider(create: (_) => TimezoneProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) => MaterialApp(
