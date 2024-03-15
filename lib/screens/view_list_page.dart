@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
+import 'package:provider/provider.dart';
 import '../components/product_component.dart';
+import '../providers/shopping_list_provider.dart';
 
 class ViewListPage extends StatefulWidget {
   const ViewListPage({super.key});
@@ -10,47 +11,30 @@ class ViewListPage extends StatefulWidget {
 }
 
 class _ViewListPageState extends State<ViewListPage> {
-  final ApiService _apiService = ApiService();
   String? _selectedListId;
-  List<dynamic>? _shoppingLists;
-  List<dynamic>? _productDetails;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchShoppingLists();
-  }
-
-  void _fetchShoppingLists() async {
-    var shoppingLists = await _apiService.getShoppingLists();
-    setState(() {
-      _shoppingLists = shoppingLists;
-      if (shoppingLists != null && shoppingLists.isNotEmpty) {
-        _selectedListId = shoppingLists.first['id'];
-        _fetchProductDetails(_selectedListId!);
-      }
-    });
-  }
-
-  void _fetchProductDetails(String listId) async {
-    var products = await _apiService.getProductDetails(listId);
-    setState(() {
-      _productDetails = products;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
+    final shoppingListProvider = Provider.of<ShoppingListProvider>(context);
+    final _shoppingLists = shoppingListProvider.shoppingLists;
+    
+    // Ensuring _selectedListId is still valid or resetting it
+    if (_shoppingLists == null || !_shoppingLists.any((list) => list['id'] == _selectedListId)) {
+      _selectedListId = _shoppingLists?.isNotEmpty == true ? _shoppingLists?.first['id'] : null;
+    }
+
+    final _productDetails = _selectedListId != null ? shoppingListProvider.productDetails[_selectedListId!] : null;
+
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            if (_shoppingLists != null) ...[
+            if (_shoppingLists != null && _shoppingLists.isNotEmpty) ...[
               DropdownButtonFormField<String>(
                 value: _selectedListId,
                 decoration: const InputDecoration(labelText: 'Select List'),
-                items: _shoppingLists!.map((list) {
+                items: _shoppingLists.map((list) {
                   return DropdownMenuItem<String>(
                     value: list['id'],
                     child: Text(list['title']),
@@ -59,39 +43,28 @@ class _ViewListPageState extends State<ViewListPage> {
                 onChanged: (newValue) {
                   setState(() {
                     _selectedListId = newValue;
-                    _fetchProductDetails(_selectedListId!);
+                    shoppingListProvider.fetchProductDetails(newValue!);
                   });
                 },
               ),
               const SizedBox(height: 20),
             ],
-            _productDetails == null
-                ? const Center(child: CircularProgressIndicator())
-                : ListView.builder(
-                    primary: false,
-                    shrinkWrap:
-                        true,
-                    itemCount: _productDetails!.length,
-                    itemBuilder: (context, index) {
-                      var product = _productDetails![index];
-                      return ProductComponent(
-                        listId: _selectedListId!,
-                        productId: product['id'],
-                        quantity: product['quantity'].toString(),
-                        unit: product['unit_of_measurement'],
-                        productName: product['name'],
-                        creator: product['creator'],
-                        createdAt: product['created_at'],
-                        lastEditedAt: product['updated_at'],
-                        onChange: () {
-                          _fetchProductDetails(_selectedListId!);
-                        },
-                      );
-                    },
-                  ),
+            if (_productDetails != null)
+              ..._productDetails.map((product) => ProductComponent(
+                    listId: _selectedListId!,
+                    productId: product['id'],
+                    quantity: product['quantity'].toString(),
+                    unit: product['unit_of_measurement'],
+                    productName: product['name'],
+                    creator: product['creator'],
+                    createdAt: product['created_at'],
+                    lastEditedAt: product['updated_at'],
+                    onChange: () => shoppingListProvider.fetchProductDetails(_selectedListId!),
+                  )).toList(),
           ],
         ),
       ),
     );
   }
 }
+

@@ -1,6 +1,7 @@
-import 'package:app/components/product_list_component.dart';
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
+import 'package:provider/provider.dart';
+import '../components/product_list_component.dart';
+import '../providers/shopping_list_provider.dart';
 
 class ShoppingPage extends StatefulWidget {
   const ShoppingPage({super.key});
@@ -10,53 +11,33 @@ class ShoppingPage extends StatefulWidget {
 }
 
 class _ShoppingPageState extends State<ShoppingPage> {
-  final ApiService _apiService = ApiService();
-  List<dynamic>? _shoppingLists;
-  final Map<String, List<dynamic>> _shoppingListProducts = {};
-  final Map<String, List<String>> _checkedProducts = {};
-
   @override
   void initState() {
     super.initState();
-    _fetchShoppingLists();
-  }
-
-  void _fetchShoppingLists() async {
-    var shoppingLists = await _apiService.getShoppingLists();
-    if (shoppingLists != null) {
-      for (var list in shoppingLists) {
-        _fetchProductDetails(list['id']);
-      }
-    }
-    setState(() {
-      _shoppingLists = shoppingLists;
-    });
-  }
-
-  void _fetchProductDetails(String listId) async {
-    var products = await _apiService.getProductDetails(listId);
-    setState(() {
-      _shoppingListProducts[listId] = products ?? [];
-      _checkedProducts[listId] = [];
-    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final shoppingListProvider = Provider.of<ShoppingListProvider>(context);
+    final shoppingLists = shoppingListProvider.shoppingLists;
+
+    // Filter shopping lists to include only those with one or more products.
+    final nonEmptyShoppingLists = shoppingLists?.where((list) {
+      final products = shoppingListProvider.productDetails[list['id']];
+      return products != null && products.isNotEmpty;
+    }).toList();
+
     return Scaffold(
-      body: _shoppingLists == null || _shoppingLists!.isEmpty
-          ? const Center(child: Text("No lists available"))
+      body: nonEmptyShoppingLists == null || nonEmptyShoppingLists.isEmpty
+          ? const Center(child: Text("No lists with items available"))
           : ListView.builder(
-              itemCount: _shoppingLists!.length,
+              itemCount: nonEmptyShoppingLists.length,
               itemBuilder: (context, index) {
-                var list = _shoppingLists![index];
-                return (_shoppingListProducts[list['id']] ?? []).isNotEmpty
-                ? ProductList(
-                    listId: list['id'],
-                    title: list['title'],
-                    products: _shoppingListProducts[list['id']] ?? [],
-                  )
-                : const SizedBox.shrink();
+                var list = nonEmptyShoppingLists[index];
+                return ProductList(
+                  listId: list['id'],
+                  title: list['title'],
+                );
               },
             ),
     );

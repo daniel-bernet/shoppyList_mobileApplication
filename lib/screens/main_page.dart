@@ -25,6 +25,14 @@ class _MainPageState extends State<MainPage> {
     const UserPage(),
   ];
 
+  final List<String> _pageTitle = [
+    'Shopping',
+    'Add Item',
+    'View List',
+    'My Lists',
+    'User',
+  ];
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -34,8 +42,8 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(
-        pageTitle: 'Page Title', 
+      appBar: CustomAppBar(
+        pageTitle: _pageTitle[_selectedIndex],
       ),
       body: IndexedStack(
         index: _selectedIndex,

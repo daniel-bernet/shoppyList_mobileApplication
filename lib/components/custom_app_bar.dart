@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String pageTitle;
-  final String logoAssetPath; // Path to the logo image asset
+  final String logoAssetPath;
 
   const CustomAppBar({
     super.key,
     required this.pageTitle,
-    this.logoAssetPath = 'assets/images/logo.png', // Ensure this path is correct.
+    this.logoAssetPath = 'assets/images/logo.png',
   });
 
   @override
@@ -22,7 +22,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Theme.of(context).colorScheme.primary,
       leading: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Image.asset(logoAssetPath), // Ensure your asset path is correct.
+        child: Image.asset(logoAssetPath),
       ),
     );
   }

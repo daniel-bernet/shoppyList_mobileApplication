@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:app/services/api_service.dart';
+import 'package:provider/provider.dart';
+import 'package:app/providers/shopping_list_provider.dart';
 import 'package:app/utils/helpers/snackbar_helper.dart';
 import 'package:app/components/list_component.dart';
 
@@ -12,34 +13,18 @@ class MyListsPage extends StatefulWidget {
 
 class _MyListsPageState extends State<MyListsPage> {
   final TextEditingController _listTitleController = TextEditingController();
-  final ApiService _apiService = ApiService();
-  List<dynamic>? _shoppingLists;
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchLists();
-  }
-
-  void _fetchLists() async {
-    var shoppingLists = await _apiService.getShoppingLists();
-    setState(() {
-      _shoppingLists = shoppingLists;
-    });
-  }
-
-  void _createList() async {
+  void _createList(ShoppingListProvider provider) async {
     final title = _listTitleController.text.trim();
     if (title.isEmpty) {
       SnackbarHelper.showSnackBar('Please enter a list title', isError: true);
       return;
     }
 
-    final success = await _apiService.createShoppingList(title);
+    final success = await provider.createShoppingList(title);
     if (success) {
       SnackbarHelper.showSnackBar('List created successfully');
       _listTitleController.clear();
-      _fetchLists();
     } else {
       SnackbarHelper.showSnackBar('Failed to create list', isError: true);
     }
@@ -47,6 +32,8 @@ class _MyListsPageState extends State<MyListsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<ShoppingListProvider>(context);
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -61,28 +48,29 @@ class _MyListsPageState extends State<MyListsPage> {
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: _createList,
+              onPressed: () => _createList(provider),
               child: const Text('Create List'),
             ),
             const SizedBox(height: 20),
             Expanded(
-                child: _shoppingLists == null
-                    ? const Center(child: CircularProgressIndicator())
-                    : ListView.builder(
-                        itemCount: _shoppingLists!.length,
-                        itemBuilder: (context, index) {
-                          var list = _shoppingLists![index];
-                          return ListComponent(
-                            title: list['title'],
-                            listId: list['id'],
-                            createdAt: DateTime.parse(list['created_at']),
-                            updatedAt: DateTime.parse(list['updated_at']),
-                            collaborators: list['collaborators'].cast<String>(),
-                            isOwner: list['is_owner'],
-                            fetchLists: _fetchLists,
-                          );
-                        },
-                      )),
+              child: provider.shoppingLists == null
+                ? const Center(child: CircularProgressIndicator())
+                : ListView.builder(
+                    itemCount: provider.shoppingLists!.length,
+                    itemBuilder: (context, index) {
+                      var list = provider.shoppingLists![index];
+                      return ListComponent(
+                        title: list['title'],
+                        listId: list['id'],
+                        createdAt: DateTime.parse(list['created_at']),
+                        updatedAt: DateTime.parse(list['updated_at']),
+                        collaborators: list['collaborators'].cast<String>(),
+                        isOwner: list['is_owner'],
+                        fetchLists: provider.fetchShoppingLists,
+                      );
+                    },
+                  ),
+            ),
           ],
         ),
       ),
