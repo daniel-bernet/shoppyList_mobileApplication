@@ -1,3 +1,4 @@
+import 'package:app/providers/language_provider.dart';
 import 'package:app/providers/timezone_provider.dart';
 import 'package:app/utils/helpers/snackbar_helper.dart';
 import 'package:app/providers/theme_provider.dart';
@@ -413,6 +414,8 @@ class _UserPageState extends State<UserPage> {
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final timezoneProvider = Provider.of<TimezoneProvider>(context);
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final availableLanguages = ['en', 'placeholder'];
 
     return Scaffold(
       body: ListView(
@@ -428,9 +431,8 @@ class _UserPageState extends State<UserPage> {
             ),
             ListTile(
               title: const Text('Registered On'),
-              subtitle:
-                  Text(_formatRegisteredOn(
-                accountInfo?['registered_on'], timezoneProvider.timezone)),
+              subtitle: Text(_formatRegisteredOn(
+                  accountInfo?['registered_on'], timezoneProvider.timezone)),
             ),
           ],
           ListTile(
@@ -482,6 +484,22 @@ class _UserPageState extends State<UserPage> {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Text(value),
+                );
+              }).toList(),
+            ),
+          ),
+          ListTile(
+            title: const Text('Language'),
+            trailing: DropdownButton<String>(
+              value: languageProvider.currentLanguage,
+              onChanged: (String? newValue) {
+                languageProvider.setLanguage(newValue!);
+              },
+              items: availableLanguages
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value.toUpperCase()),
                 );
               }).toList(),
             ),

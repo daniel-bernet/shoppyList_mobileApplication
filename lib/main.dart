@@ -1,3 +1,4 @@
+import 'package:app/providers/language_provider.dart';
 import 'package:app/providers/timezone_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,6 +34,7 @@ class ShoppyListApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => ShoppingListProvider()),
         ChangeNotifierProvider(create: (_) => TimezoneProvider()),
+        ChangeNotifierProvider(create: (_) => LanguageProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) => MaterialApp(
