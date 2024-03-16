@@ -26,11 +26,11 @@ class _MainPageState extends State<MainPage> {
   ];
 
   final List<String> _pageTitle = [
-    'Shopping',
-    'Add Item',
-    'View List',
-    'My Lists',
-    'User',
+    'shoppingPage',
+    'addItemPage',
+    'viewListPage',
+    'myListsPage',
+    'userPage',
   ];
 
   void _onItemTapped(int index) {

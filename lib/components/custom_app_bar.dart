@@ -1,29 +1,25 @@
-import 'package:app/utils/theme/app_colors.dart';
+import 'package:app/l10n/app_localization.dart';
 import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String pageTitle;
-  final String logoAssetPath;
 
   const CustomAppBar({
     super.key,
     required this.pageTitle,
-    this.logoAssetPath = 'assets/images/logo.png',
   });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       title: Text(
-        pageTitle,
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(color:AppColors.lightOnPrimaryColor)
+        AppLocalizations.of(context).translate(pageTitle),
+        style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimary,
+            fontWeight: FontWeight.bold),
       ),
       centerTitle: true,
       backgroundColor: Theme.of(context).colorScheme.primary,
-      leading: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Image.asset(logoAssetPath),
-      ),
     );
   }
 

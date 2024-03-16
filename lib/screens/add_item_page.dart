@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/shopping_list_provider.dart';
 import '../utils/helpers/snackbar_helper.dart';
+import '../l10n/app_localization.dart';
 
 class AddItemPage extends StatefulWidget {
   const AddItemPage({super.key});
@@ -18,38 +19,38 @@ class _AddItemPageState extends State<AddItemPage> {
 
   void _addProduct() async {
     final provider = Provider.of<ShoppingListProvider>(context, listen: false);
+    final appLocalizations = AppLocalizations.of(context);
 
     if (_selectedList == null ||
         _selectedUnit == null ||
         _nameController.text.isEmpty ||
         _quantityController.text.isEmpty) {
-      SnackbarHelper.showSnackBar('Please fill all fields', isError: true);
+      SnackbarHelper.showSnackBar(appLocalizations.translate('pleaseFillAllFields'), isError: true);
       return;
     }
 
     final success = await provider.addProductToList(_selectedList!,
         _nameController.text, _quantityController.text, _selectedUnit!);
     if (success) {
-      SnackbarHelper.showSnackBar('Product added successfully');
+      SnackbarHelper.showSnackBar(appLocalizations.translate('productAddedSuccessfully'));
       _nameController.clear();
       _quantityController.clear();
-      // Ensure the selected list and unit are retained, and available after the update.
       if (!provider.shoppingLists!.any((list) => list['id'] == _selectedList)) {
         _selectedList = null;
       }
     } else {
-      SnackbarHelper.showSnackBar('Failed to add product', isError: true);
+      SnackbarHelper.showSnackBar(appLocalizations.translate('failedToAddProduct'), isError: true);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ShoppingListProvider>(context);
-    final _shoppingLists = provider.shoppingLists;
+    final shoppingLists = provider.shoppingLists;
+    final appLocalizations = AppLocalizations.of(context);
 
-    // Validate and possibly update the selected list if it no longer exists.
     if (_selectedList != null &&
-        !_shoppingLists!.any((list) => list['id'] == _selectedList)) {
+        !shoppingLists!.any((list) => list['id'] == _selectedList)) {
       _selectedList = null;
     }
 
@@ -62,24 +63,22 @@ class _AddItemPageState extends State<AddItemPage> {
           children: [
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Product Name'),
+              decoration: InputDecoration(labelText: appLocalizations.translate('productName')),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: _quantityController,
-              decoration: const InputDecoration(labelText: 'Quantity'),
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(labelText: appLocalizations.translate('quantity')),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
             ),
             const SizedBox(height: 10),
             DropdownButtonFormField<String>(
               value: _selectedUnit,
-              decoration:
-                  const InputDecoration(labelText: 'Unit of Measurement'),
-              items: ['g', 'kg', 'dL', 'L', 'Stk.'].map((String value) {
+              decoration: InputDecoration(labelText: appLocalizations.translate('unitOfMeasurement')),
+              items: ['gram', 'kiloGram', 'deciLitre', 'litre', 'piece'].map((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
-                  child: Text(value),
+                  child: Text(appLocalizations.translate(value)),
                 );
               }).toList(),
               onChanged: (newValue) {
@@ -91,18 +90,18 @@ class _AddItemPageState extends State<AddItemPage> {
             const SizedBox(height: 10),
             DropdownButtonFormField<String>(
               value: _selectedList,
-              decoration: const InputDecoration(labelText: 'Shopping List'),
-              hint: _shoppingLists == null || _shoppingLists.isEmpty
-                  ? const Text("No lists available")
+              decoration: InputDecoration(labelText: appLocalizations.translate('shoppingList')),
+              hint: shoppingLists == null || shoppingLists.isEmpty
+                  ? Text(appLocalizations.translate("noListsAvailable"))
                   : null,
-              items: _shoppingLists?.map((list) {
+              items: shoppingLists?.map((list) {
                     return DropdownMenuItem<String>(
                       value: list['id'],
                       child: Text(list['title']),
                     );
                   }).toList() ??
                   [],
-              onChanged: (_shoppingLists == null || _shoppingLists.isEmpty)
+              onChanged: (shoppingLists == null || shoppingLists.isEmpty)
                   ? null
                   : (newValue) {
                       setState(() {
@@ -113,7 +112,7 @@ class _AddItemPageState extends State<AddItemPage> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _addProduct,
-              child: const Text('Add Product'),
+              child: Text(appLocalizations.translate('addProduct')),
             ),
           ],
         ),

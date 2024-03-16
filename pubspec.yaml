@@ -31,4 +31,5 @@ flutter:
 
   assets:
     - assets/images/
-    - assets/languages/
+    - assets/languages/en.json
+    - assets/languages/de.json

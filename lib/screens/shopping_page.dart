@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_localization.dart';
 import '../components/product_list_component.dart';
 import '../providers/shopping_list_provider.dart';
 
@@ -7,10 +8,10 @@ class ShoppingPage extends StatefulWidget {
   const ShoppingPage({super.key});
 
   @override
-  _ShoppingPageState createState() => _ShoppingPageState();
+  ShoppingPageState createState() => ShoppingPageState();
 }
 
-class _ShoppingPageState extends State<ShoppingPage> {
+class ShoppingPageState extends State<ShoppingPage> {
   @override
   void initState() {
     super.initState();
@@ -21,7 +22,6 @@ class _ShoppingPageState extends State<ShoppingPage> {
     final shoppingListProvider = Provider.of<ShoppingListProvider>(context);
     final shoppingLists = shoppingListProvider.shoppingLists;
 
-    // Filter shopping lists to include only those with one or more products.
     final nonEmptyShoppingLists = shoppingLists?.where((list) {
       final products = shoppingListProvider.productDetails[list['id']];
       return products != null && products.isNotEmpty;
@@ -29,7 +29,7 @@ class _ShoppingPageState extends State<ShoppingPage> {
 
     return Scaffold(
       body: nonEmptyShoppingLists == null || nonEmptyShoppingLists.isEmpty
-          ? const Center(child: Text("No lists with items available"))
+          ? Center(child: Text(AppLocalizations.of(context).translate('noListsWithItemsAvailable')))
           : ListView.builder(
               itemCount: nonEmptyShoppingLists.length,
               itemBuilder: (context, index) {

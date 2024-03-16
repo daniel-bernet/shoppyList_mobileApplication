@@ -7,12 +7,13 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.light(
+      colorScheme: const ColorScheme.light(
         primary: AppColors.lightPrimaryColor,
         onPrimary: AppColors.lightOnPrimaryColor,
         secondary: AppColors.lightSecondaryColor,
         background: AppColors.lightBackground,
         surface: AppColors.lightSurface,
+        error: AppColors.lightWarningColor,
       ),
       scaffoldBackgroundColor: AppColors.lightBackground,
       textTheme: const TextTheme(
@@ -28,7 +29,7 @@ class AppTheme {
           letterSpacing: 0.5,
         ),
       ),
-      inputDecorationTheme: InputDecorationTheme(
+      inputDecorationTheme: const InputDecorationTheme(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(8)),
           borderSide: BorderSide(color: AppColors.lightSecondaryColor),
@@ -44,12 +45,13 @@ class AppTheme {
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.dark(
+      colorScheme: const ColorScheme.dark(
         primary: AppColors.darkPrimaryColor,
         onPrimary: AppColors.darkOnPrimaryColor,
         secondary: AppColors.darkSecondaryColor,
         background: AppColors.darkBackground,
         surface: AppColors.darkSurface,
+        error: AppColors.darkWarningColor,
       ),
       scaffoldBackgroundColor: AppColors.darkBackground,
       textTheme: const TextTheme(
@@ -65,7 +67,7 @@ class AppTheme {
           letterSpacing: 0.5,
         ),
       ),
-      inputDecorationTheme: InputDecorationTheme(
+      inputDecorationTheme: const InputDecorationTheme(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(8)),
           borderSide: BorderSide(color: AppColors.darkSecondaryColor),

@@ -14,19 +14,21 @@ import 'values/app_strings.dart';
 import 'routes.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
-void main() {
+void main() async {
   tz.initializeTimeZones();
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(statusBarIconBrightness: Brightness.light),
-  );
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then(
-    (_) => runApp(const ShoppyListApp()),
-  );
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  LanguageProvider languageProvider = LanguageProvider();
+  await languageProvider.loadSavedLanguage();
+
+  runApp(ShoppyListApp(languageProvider: languageProvider));
 }
 
 class ShoppyListApp extends StatelessWidget {
-  const ShoppyListApp({super.key});
+  final LanguageProvider languageProvider;
+
+  const ShoppyListApp({super.key, required this.languageProvider});
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +37,15 @@ class ShoppyListApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => ShoppingListProvider()),
         ChangeNotifierProvider(create: (_) => TimezoneProvider()),
-        ChangeNotifierProvider(create: (_) => LanguageProvider()),
+        ChangeNotifierProvider(create: (_) => languageProvider),
       ],
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, child) => MaterialApp(
+      child: Consumer2<ThemeProvider, LanguageProvider>(
+        builder: (context, themeProvider, languageProvider, child) =>
+            MaterialApp(
           debugShowCheckedModeBanner: false,
           title: AppStrings.loginAndRegister,
           theme: themeProvider.themeData,
+          locale: Locale(languageProvider.currentLanguage, ''),
           initialRoute: AppRoutes.login,
           scaffoldMessengerKey: SnackbarHelper.key,
           navigatorKey: NavigationHelper.key,
@@ -58,7 +62,8 @@ class ShoppyListApp extends StatelessWidget {
           ],
           localeResolutionCallback: (locale, supportedLocales) {
             for (var supportedLocale in supportedLocales) {
-              if (supportedLocale.languageCode == locale?.languageCode) {
+              if (supportedLocale.languageCode == locale?.languageCode &&
+                  supportedLocale.countryCode == locale?.countryCode) {
                 return supportedLocale;
               }
             }

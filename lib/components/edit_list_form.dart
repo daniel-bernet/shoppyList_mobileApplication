@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app/l10n/app_localization.dart';
 import '../services/api_service.dart';
 import '../utils/helpers/snackbar_helper.dart';
 import '../components/reusable_alert_dialog.dart';
@@ -34,19 +35,26 @@ class _EditListFormState extends State<EditListForm> {
   }
 
   void _showDeleteConfirmation() {
+    final appLocalizations = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return ReusableAlertDialog(
-          title: 'Confirm Deletion',
-          content: 'Are you sure you want to delete this list?',
+          title: appLocalizations.translate('confirmDeletion'),
+          content: appLocalizations.translate('areYouSureDeleteList'),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel'),
+              child: Text(appLocalizations.translate('cancel')),
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-              child: const Text('Delete'),
+              child: Text(
+                appLocalizations.translate('deleteList'),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               onPressed: () {
                 _deleteList();
                 Navigator.of(context).pop();
@@ -60,19 +68,25 @@ class _EditListFormState extends State<EditListForm> {
 
   void _deleteList() async {
     final success = await _apiService.deleteShoppingList(widget.listId);
+    final appLocalizations = AppLocalizations.of(context);
     if (success) {
       widget.fetchLists();
-      SnackbarHelper.showSnackBar('List deleted successfully');
-      Navigator.of(context).pop();
+      SnackbarHelper.showSnackBar(
+          appLocalizations.translate('listDeletedSuccessfully'));
+      if (mounted) Navigator.of(context).pop();
     } else {
-      SnackbarHelper.showSnackBar('Failed to delete list', isError: true);
+      SnackbarHelper.showSnackBar(
+          appLocalizations.translate('failedToDeleteProduct'),
+          isError: true);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context);
     return AlertDialog(
-      title: Text('Edit ${widget.initialListTitle}'),
+      title: Text(
+          '${appLocalizations.translate('edit')} ${widget.initialListTitle}'),
       content: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,8 +95,8 @@ class _EditListFormState extends State<EditListForm> {
             TextField(
               controller: _collaboratorEmailController,
               decoration: InputDecoration(
-                labelText: 'Add Collaborator',
-                hintText: 'Enter collaborator email',
+                labelText: appLocalizations.translate('addCollaborator'),
+                hintText: appLocalizations.translate('enterCollaboratorEmail'),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: _addCollaborator,
@@ -91,7 +105,7 @@ class _EditListFormState extends State<EditListForm> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Collaborators:',
+              appLocalizations.translate('collaborators'),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 10),
@@ -111,8 +125,8 @@ class _EditListFormState extends State<EditListForm> {
                             ))
                         .toList(),
                   )
-                : Text('No collaborators added yet',
-                    style: Theme.of(context).textTheme.bodyText1),
+                : Text(appLocalizations.translate('noCollaboratorsAddedYet'),
+                    style: Theme.of(context).textTheme.bodyLarge),
           ],
         ),
       ),
@@ -120,46 +134,55 @@ class _EditListFormState extends State<EditListForm> {
         TextButton(
           onPressed: _showDeleteConfirmation,
           style: TextButton.styleFrom(),
-          child: const Text('Delete List'),
+          child: Text(appLocalizations.translate('deleteList')),
         ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Close'),
+          child: Text(appLocalizations.translate('close')),
         ),
       ],
     );
   }
 
   void _addCollaborator() async {
+    final appLocalizations = AppLocalizations.of(context);
     final email = _collaboratorEmailController.text.trim();
     if (email.isEmpty) {
-      SnackbarHelper.showSnackBar('Please enter an email', isError: true);
+      SnackbarHelper.showSnackBar(
+          appLocalizations.translate('pleaseEnterEmailAddress'),
+          isError: true);
       return;
     }
 
     final success = await _apiService.addCollaborator(widget.listId, email);
     if (success) {
-      SnackbarHelper.showSnackBar('Collaborator added successfully');
+      SnackbarHelper.showSnackBar(
+          appLocalizations.translate('collaboratorAddedSuccessfully'));
       setState(() {
         _collaborators.add(email);
       });
       _collaboratorEmailController.clear();
       widget.fetchLists();
     } else {
-      SnackbarHelper.showSnackBar('Failed to add collaborator', isError: true);
+      SnackbarHelper.showSnackBar(
+          appLocalizations.translate('failedToAddCollaborator'),
+          isError: true);
     }
   }
 
   void _removeCollaborator(String email) async {
+    final appLocalizations = AppLocalizations.of(context);
     final success = await _apiService.removeCollaborator(widget.listId, email);
     if (success) {
-      SnackbarHelper.showSnackBar('Collaborator removed successfully');
+      SnackbarHelper.showSnackBar(
+          appLocalizations.translate('collaboratorRemovedSuccessfully'));
       setState(() {
         _collaborators.removeWhere((collab) => collab == email);
       });
       widget.fetchLists();
     } else {
-      SnackbarHelper.showSnackBar('Failed to remove collaborator',
+      SnackbarHelper.showSnackBar(
+          appLocalizations.translate('failedToRemoveCollaborator'),
           isError: true);
     }
   }

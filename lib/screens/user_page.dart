@@ -1,3 +1,4 @@
+import 'package:app/l10n/app_localization.dart';
 import 'package:app/providers/language_provider.dart';
 import 'package:app/providers/timezone_provider.dart';
 import 'package:app/utils/helpers/snackbar_helper.dart';
@@ -61,20 +62,27 @@ class _UserPageState extends State<UserPage> {
   }
 
   void _logOut() async {
+    final appLocalizations = AppLocalizations.of(context);
     final confirmLogout = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Log Out'),
-          content: const Text('Are you sure you want to log out?'),
+          title: Text(appLocalizations.translate('logOut')),
+          content: Text(appLocalizations.translate('areYouSureLogOut')),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
+              child: Text(appLocalizations.translate('cancel')),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Log Out'),
+              child: Text(
+                appLocalizations.translate('logOut'),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         );
@@ -87,6 +95,7 @@ class _UserPageState extends State<UserPage> {
   }
 
   void _changeEmail() {
+    final appLocalizations = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -105,12 +114,14 @@ class _UserPageState extends State<UserPage> {
               children: <Widget>[
                 TextFormField(
                   controller: newEmailController,
-                  decoration: const InputDecoration(hintText: "New Email"),
+                  decoration: InputDecoration(
+                      hintText: appLocalizations.translate('newEmail')),
                   validator: (value) {
                     if (value == null ||
                         value.isEmpty ||
                         !value.contains('@')) {
-                      return 'Please enter a valid email';
+                      return appLocalizations
+                          .translate('pleaseEnterEmailAddress');
                     }
                     return null;
                   },
@@ -118,11 +129,11 @@ class _UserPageState extends State<UserPage> {
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: currentPasswordController,
-                  decoration:
-                      const InputDecoration(hintText: "Current Password"),
+                  decoration: InputDecoration(
+                      hintText: appLocalizations.translate('confirmPassword')),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your current password';
+                      return appLocalizations.translate('pleaseEnterPassword');
                     }
                     return null;
                   },
@@ -174,6 +185,7 @@ class _UserPageState extends State<UserPage> {
   }
 
   void _changeUsername() {
+    final appLocalizations = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -192,10 +204,11 @@ class _UserPageState extends State<UserPage> {
               children: <Widget>[
                 TextFormField(
                   controller: newUsernameController,
-                  decoration: const InputDecoration(hintText: "New Username"),
+                  decoration: InputDecoration(
+                      hintText: appLocalizations.translate('newName')),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter a valid username';
+                      return appLocalizations.translate('pleaseEnterName');
                     }
                     return null;
                   },
@@ -203,11 +216,11 @@ class _UserPageState extends State<UserPage> {
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: currentPasswordController,
-                  decoration:
-                      const InputDecoration(hintText: "Current Password"),
+                  decoration: InputDecoration(
+                      hintText: appLocalizations.translate('confirmPassword')),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your current password';
+                      return appLocalizations.translate('pleaseEnterPassword');
                     }
                     return null;
                   },
@@ -218,13 +231,13 @@ class _UserPageState extends State<UserPage> {
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text(AppStrings.cancel),
+              child: Text(appLocalizations.translate('cancle')),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text(AppStrings.submit),
+              child: Text(appLocalizations.translate('submit')),
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
                   bool success = await apiService.editUsername(
@@ -237,15 +250,17 @@ class _UserPageState extends State<UserPage> {
                     _fetchAccountInfo();
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text(AppStrings.usernameChangedSuccess)),
+                        SnackBar(
+                            content: Text(appLocalizations
+                                .translate('usernameChangedSuccess'))),
                       );
                     }
                   } else {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text(AppStrings.usernameChangedFailure)),
+                        SnackBar(
+                            content: Text(appLocalizations
+                                .translate('usernameChangedFailure'))),
                       );
                     }
                   }
@@ -259,6 +274,7 @@ class _UserPageState extends State<UserPage> {
   }
 
   void _changePassword() {
+    final appLocalizations = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -271,7 +287,7 @@ class _UserPageState extends State<UserPage> {
         final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
         return AlertDialog(
-          title: const Text(AppStrings.changePassword),
+          title: Text(appLocalizations.translate('changePassword')),
           content: Form(
             key: formKey,
             child: Column(
@@ -279,12 +295,12 @@ class _UserPageState extends State<UserPage> {
               children: <Widget>[
                 TextFormField(
                   controller: currentPasswordController,
-                  decoration:
-                      const InputDecoration(hintText: "Current Password"),
+                  decoration: InputDecoration(
+                      hintText: appLocalizations.translate('password')),
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your current password';
+                      return appLocalizations.translate('pleaseEnterPassword');
                     }
                     return null;
                   },
@@ -292,14 +308,15 @@ class _UserPageState extends State<UserPage> {
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: newPasswordController,
-                  decoration: const InputDecoration(hintText: "New Password"),
+                  decoration: InputDecoration(
+                      hintText: appLocalizations.translate('newPassword')),
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your new password';
+                      return appLocalizations.translate('pleaseEnterPassoword');
                     }
                     if (!AppRegex.passwordRegex.hasMatch(value)) {
-                      return 'Your password does not meet the requirements';
+                      return appLocalizations.translate('invalidPassword');
                     }
                     return null;
                   },
@@ -307,14 +324,14 @@ class _UserPageState extends State<UserPage> {
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: confirmNewPasswordController,
-                  decoration:
-                      const InputDecoration(hintText: "Confirm New Password"),
+                  decoration: InputDecoration(
+                      hintText: appLocalizations.translate('confirmPassword')),
                   obscureText: true,
                   validator: (value) {
                     if (value == null ||
                         value.isEmpty ||
                         value != newPasswordController.text) {
-                      return 'The password confirmation does not match';
+                      return appLocalizations.translate('passwordNotMatched');
                     }
                     return null;
                   },
@@ -324,13 +341,13 @@ class _UserPageState extends State<UserPage> {
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text(AppStrings.cancel),
+              child: Text(appLocalizations.translate('cancel')),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text(AppStrings.submit),
+              child: Text(appLocalizations.translate('submit')),
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
                   bool success = await apiService.changePassword(
@@ -341,17 +358,17 @@ class _UserPageState extends State<UserPage> {
                   if (success) {
                     if (context.mounted) Navigator.of(context).pop();
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text(AppStrings.passwordChangedSuccess)),
-                      );
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(appLocalizations
+                            .translate('passwordChangedSuccess')),
+                      ));
                     }
                   } else {
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text(AppStrings.passwordChangedFailure)),
-                      );
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(appLocalizations
+                            .translate('passwordChangedFailure')),
+                      ));
                     }
                   }
                 }
@@ -364,21 +381,27 @@ class _UserPageState extends State<UserPage> {
   }
 
   void _deleteAccount() async {
+    final appLocalizations = AppLocalizations.of(context);
     final confirmDeletion = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Delete Account'),
-          content: const Text(
-              'Are you sure you want to delete your account? This action cannot be undone\n\nAll information, lists and products associated with this account will be removed.'),
+          title: Text(appLocalizations.translate('deleteAccount')),
+          content: Text(appLocalizations.translate('areYouSureDeleteAccount')),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
+              child: Text(appLocalizations.translate('cancel')),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+              child: Text(
+                appLocalizations.translate('delete'),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         );
@@ -388,10 +411,13 @@ class _UserPageState extends State<UserPage> {
     if (confirmDeletion == true) {
       final success = await apiService.deleteAccount();
       if (success) {
-        SnackbarHelper.showSnackBar('Account deleted successfully.');
+        SnackbarHelper.showSnackBar(
+            appLocalizations.translate('accountDeletionSuccess'));
         NavigationHelper.pushReplacementNamed(AppRoutes.login);
       } else {
-        SnackbarHelper.showSnackBar('Failed to delete account.', isError: true);
+        SnackbarHelper.showSnackBar(
+            appLocalizations.translate('accountDeletionFailure'),
+            isError: true);
       }
     }
   }
@@ -425,53 +451,54 @@ class _UserPageState extends State<UserPage> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final timezoneProvider = Provider.of<TimezoneProvider>(context);
     final languageProvider = Provider.of<LanguageProvider>(context);
-    final availableLanguages = ['en', 'placeholder'];
+    final appLocalizations = AppLocalizations.of(context);
+    final availableLanguages = ['en', 'de'];
 
     return Scaffold(
       body: ListView(
         children: [
           if (accountInfo != null) ...[
             ListTile(
-              title: const Text('Username'),
+              title: Text(appLocalizations.translate('username')),
               subtitle: Text(accountInfo!['username'] ?? 'N/A'),
             ),
             ListTile(
-              title: const Text('Email'),
+              title: Text(appLocalizations.translate('email')),
               subtitle: Text(accountInfo!['email'] ?? 'N/A'),
             ),
             ListTile(
-              title: const Text('Registered On'),
+              title: Text(appLocalizations.translate('registeredOn')),
               subtitle: Text(_formatRegisteredOn(
                   accountInfo?['registered_on'], timezoneProvider.timezone)),
             ),
           ],
           ListTile(
             trailing: const Icon(Icons.email),
-            title: const Text(AppStrings.changeEmail),
+            title: Text(appLocalizations.translate('changeEmail')),
             onTap: _changeEmail,
           ),
           ListTile(
             trailing: const Icon(Icons.person),
-            title: const Text(AppStrings.changeUsername),
+            title: Text(appLocalizations.translate('changeUsername')),
             onTap: _changeUsername,
           ),
           ListTile(
             trailing: const Icon(Icons.logout),
-            title: const Text(AppStrings.logOut),
+            title: Text(appLocalizations.translate('logOut')),
             onTap: _logOut,
           ),
           ListTile(
             trailing: const Icon(Icons.password),
-            title: const Text(AppStrings.changePassword),
+            title: Text(appLocalizations.translate('changePassword')),
             onTap: _changePassword,
           ),
           ListTile(
             trailing: const Icon(Icons.delete),
-            title: const Text(AppStrings.deleteAccount),
+            title: Text(appLocalizations.translate('deleteAccount')),
             onTap: _deleteAccount,
           ),
           SwitchListTile(
-            title: const Text(AppStrings.darkMode),
+            title: Text(appLocalizations.translate('darkMode')),
             value: isDarkMode,
             onChanged: (bool value) {
               final themeProvider =
@@ -480,7 +507,7 @@ class _UserPageState extends State<UserPage> {
             },
           ),
           ListTile(
-            title: const Text('Timezone'),
+            title: Text(appLocalizations.translate('timezone')),
             trailing: DropdownButton<String>(
               value: selectedTimezone,
               onChanged: (String? newValue) async {
@@ -499,7 +526,7 @@ class _UserPageState extends State<UserPage> {
             ),
           ),
           ListTile(
-            title: const Text('Language'),
+            title: Text(appLocalizations.translate('language')),
             trailing: DropdownButton<String>(
               value: languageProvider.currentLanguage,
               onChanged: (String? newValue) {

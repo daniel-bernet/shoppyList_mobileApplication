@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../components/reusable_alert_dialog.dart';
 import '../utils/helpers/snackbar_helper.dart';
+import '../l10n/app_localization.dart';
 
 class ProductComponent extends StatelessWidget {
   final String listId;
@@ -32,28 +33,36 @@ class ProductComponent extends StatelessWidget {
     ApiService apiService = ApiService();
     final success =
         await apiService.deleteProductFromShoppingList(listId, productId);
+    final appLocalizations = AppLocalizations.of(context);
     if (success) {
-      SnackbarHelper.showSnackBar('Product deleted successfully');
+      SnackbarHelper.showSnackBar(
+          appLocalizations.translate('productDeletedSuccessfully'));
       onChange();
     } else {
-      SnackbarHelper.showSnackBar('Failed to delete product', isError: true);
+      SnackbarHelper.showSnackBar(
+          appLocalizations.translate('failedToDeleteProduct'),
+          isError: true);
     }
   }
 
   void _showDeleteConfirmation(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return ReusableAlertDialog(
-          title: 'Confirm Deletion',
-          content: 'Are you sure you want to delete this product?',
+          title: appLocalizations.translate('confirmDeletion'),
+          content: appLocalizations.translate('areYouSureDeleteProduct'),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel'),
+              child: Text(appLocalizations.translate('cancel')),
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-              child: const Text('Delete'),
+              child: Text(appLocalizations.translate('delete'),
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                      fontWeight: FontWeight.bold)),
               onPressed: () {
                 _deleteProduct(context);
                 Navigator.of(context).pop();
@@ -84,14 +93,14 @@ class ProductComponent extends StatelessWidget {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
         title: Text(productName, style: Theme.of(context).textTheme.titleLarge),
-        subtitle: Text('$quantity $unit', style: Theme.of(context).textTheme.bodySmall),
+        subtitle: Text('$quantity ${AppLocalizations.of(context).translate(unit)}',
+            style: Theme.of(context).textTheme.bodySmall),
         trailing: Wrap(
           spacing: 12,
           children: <Widget>[

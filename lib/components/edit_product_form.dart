@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:timezone/timezone.dart' as tz;
 import '../services/api_service.dart';
 import '../utils/helpers/snackbar_helper.dart';
+import '../l10n/app_localization.dart';
 
 class EditProductForm extends StatefulWidget {
   final String listId;
@@ -58,7 +59,15 @@ class _EditProductFormState extends State<EditProductForm> {
     super.initState();
     _nameController = TextEditingController(text: widget.initialProductName);
     _quantityController = TextEditingController(text: widget.initialQuantity);
-    _selectedUnit = widget.initialUnit;
+    final List<String> units = [
+      'gram',
+      'kiloGram',
+      'deciLitre',
+      'litre',
+      'piece'
+    ];
+    _selectedUnit =
+        units.contains(widget.initialUnit) ? widget.initialUnit : units.first;
   }
 
   void _submitForm() async {
@@ -71,7 +80,7 @@ class _EditProductFormState extends State<EditProductForm> {
     );
 
     if (success) {
-      Navigator.of(context).pop();
+      if (mounted) Navigator.of(context).pop();
       SnackbarHelper.showSnackBar('Product updated successfully');
       widget.onFormSubmit();
     } else {
@@ -81,6 +90,7 @@ class _EditProductFormState extends State<EditProductForm> {
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context);
     return AlertDialog(
       title: const Text('Edit Product'),
       content: SingleChildScrollView(
@@ -88,46 +98,55 @@ class _EditProductFormState extends State<EditProductForm> {
           children: <Widget>[
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Product Name'),
+              decoration: InputDecoration(
+                  labelText: appLocalizations.translate('productName')),
             ),
             const SizedBox(height: 10),
             TextField(
               controller: _quantityController,
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(labelText: 'Quantity'),
+              decoration: InputDecoration(
+                  labelText: appLocalizations.translate('quantity')),
             ),
             const SizedBox(height: 10),
             DropdownButtonFormField<String>(
-              value: _selectedUnit,
+              value:
+                  _selectedUnit,
               onChanged: (String? newValue) {
                 setState(() {
                   _selectedUnit = newValue;
                 });
               },
-              items: <String>['g', 'kg', 'dL', 'L', 'Stk.'].map((String value) {
+              items: ['gram', 'kiloGram', 'deciLitre', 'litre', 'piece']
+                  .map((String value) {
                 return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
+                  value:
+                      value,
+                  child: Text(appLocalizations
+                      .translate(value)),
                 );
               }).toList(),
-              decoration: const InputDecoration(labelText: 'Unit'),
+              decoration: InputDecoration(
+                  labelText: appLocalizations.translate('unitOfMeasurement')),
             ),
             const SizedBox(height: 10),
-            Text('Creator: ${widget.creator}'),
-            Text('Created at: ${_formatDateTime(widget.createdAt, context)}'),
-            Text('Last edit: ${_formatDateTime(widget.lastEditedAt, context)}'),
+            Text('${appLocalizations.translate('creator')}: ${widget.creator}'),
+            Text(
+                '${appLocalizations.translate('createdAt')}: ${_formatDateTime(widget.createdAt, context)}'),
+            Text(
+                '${appLocalizations.translate('lastEdit')}: ${_formatDateTime(widget.lastEditedAt, context)}'),
           ],
         ),
       ),
       actions: <Widget>[
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(appLocalizations.translate('cancle')),
         ),
         TextButton(
           onPressed: _submitForm,
-          child: const Text('Submit'),
+          child: Text(appLocalizations.translate('submit')),
         ),
       ],
     );

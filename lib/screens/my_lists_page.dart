@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:intl/intl.dart';
+import 'package:app/l10n/app_localization.dart';
 import 'package:app/providers/shopping_list_provider.dart';
 import 'package:app/utils/helpers/snackbar_helper.dart';
 import 'package:app/components/list_component.dart';
-import 'package:app/providers/timezone_provider.dart'; // Assuming you have this
+import 'package:app/providers/timezone_provider.dart';
 
 class MyListsPage extends StatefulWidget {
   const MyListsPage({super.key});
@@ -19,25 +20,24 @@ class _MyListsPageState extends State<MyListsPage> {
 
   void _createList(ShoppingListProvider provider) async {
     final title = _listTitleController.text.trim();
+    final appLocalizations = AppLocalizations.of(context);
     if (title.isEmpty) {
-      SnackbarHelper.showSnackBar('Please enter a list title', isError: true);
+      SnackbarHelper.showSnackBar(appLocalizations.translate('pleaseFillAllFields'), isError: true);
       return;
     }
 
     final success = await provider.createShoppingList(title);
     if (success) {
-      SnackbarHelper.showSnackBar('List created successfully');
+      SnackbarHelper.showSnackBar(appLocalizations.translate('listCreatedSuccessfully'));
       _listTitleController.clear();
     } else {
-      SnackbarHelper.showSnackBar('Failed to create list', isError: true);
+      SnackbarHelper.showSnackBar(appLocalizations.translate('failedToCreateList'), isError: true);
     }
   }
 
   String _formatDateTime(String dateTimeStr, BuildContext context) {
-    final timezoneProvider =
-        Provider.of<TimezoneProvider>(context, listen: false);
-    final String timezoneId = timezoneProvider
-        .timezone; // Assuming this gives ID like 'Europe/London'
+    final timezoneProvider = Provider.of<TimezoneProvider>(context, listen: false);
+    final String timezoneId = timezoneProvider.timezone;
     final DateFormat formatter = DateFormat('dd.MM.yyyy HH:mm');
     final DateTime dateTime = DateTime.parse(dateTimeStr).toUtc();
     final location = tz.getLocation(timezoneId);
@@ -49,6 +49,7 @@ class _MyListsPageState extends State<MyListsPage> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ShoppingListProvider>(context);
+    final appLocalizations = AppLocalizations.of(context);
 
     return Scaffold(
       body: Padding(
@@ -58,14 +59,14 @@ class _MyListsPageState extends State<MyListsPage> {
           children: [
             TextField(
               controller: _listTitleController,
-              decoration: const InputDecoration(
-                labelText: 'List Title',
+              decoration: InputDecoration(
+                labelText: appLocalizations.translate('listTitle'),
               ),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () => _createList(provider),
-              child: const Text('Create List'),
+              child: Text(appLocalizations.translate('createList')),
             ),
             const SizedBox(height: 20),
             Expanded(
@@ -78,10 +79,8 @@ class _MyListsPageState extends State<MyListsPage> {
                         return ListComponent(
                           title: list['title'],
                           listId: list['id'],
-                          createdAt:
-                              _formatDateTime(list['created_at'], context),
-                          updatedAt:
-                              _formatDateTime(list['updated_at'], context),
+                          createdAt: _formatDateTime(list['created_at'], context),
+                          updatedAt: _formatDateTime(list['updated_at'], context),
                           collaborators: list['collaborators'].cast<String>(),
                           isOwner: list['is_owner'],
                           fetchLists: provider.fetchShoppingLists,

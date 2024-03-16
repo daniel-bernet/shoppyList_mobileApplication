@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:app/l10n/app_localization.dart';
 import '../services/api_service.dart';
 import '../utils/helpers/snackbar_helper.dart';
 import '../components/reusable_alert_dialog.dart';
@@ -26,24 +27,21 @@ class ListComponent extends StatelessWidget {
   });
 
   void _showLeaveConfirmation(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return ReusableAlertDialog(
-          title: 'Confirm',
-          content: 'Are you sure you want to leave this list?',
+          title: appLocalizations.translate('confirm'),
+          content: appLocalizations.translate('areYouSureLeaveList'),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              child: Text(appLocalizations.translate('cancel')),
+              onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-              child: const Text('Leave'),
-              onPressed: () {
-                _removeSelf(context);
-              },
+              child: Text(appLocalizations.translate('leave')),
+              onPressed: () => _removeSelf(context),
             ),
           ],
         );
@@ -52,13 +50,14 @@ class ListComponent extends StatelessWidget {
   }
 
   void _removeSelf(BuildContext context) async {
+    final appLocalizations = AppLocalizations.of(context);
     Navigator.of(context).pop();
     final success = await apiService.leaveListAsCollaborator(listId);
     if (success) {
-      SnackbarHelper.showSnackBar('Successfully left the list', isError: false);
+      SnackbarHelper.showSnackBar(appLocalizations.translate('successfullyLeftList'));
       fetchLists();
     } else {
-      SnackbarHelper.showSnackBar('Failed to leave the list', isError: true);
+      SnackbarHelper.showSnackBar(appLocalizations.translate('failedToLeaveList'), isError: true);
     }
   }
 
@@ -78,10 +77,11 @@ class ListComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context);
     return Card(
       child: ListTile(
         title: Text(title),
-        subtitle: Text('Last edit: $updatedAt'),
+        subtitle: Text('${appLocalizations.translate('lastEdit')}: $updatedAt'),
         trailing: isOwner
             ? IconButton(
                 icon: const Icon(Icons.edit),
