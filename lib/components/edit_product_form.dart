@@ -142,7 +142,7 @@ class _EditProductFormState extends State<EditProductForm> {
       actions: <Widget>[
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: Text(appLocalizations.translate('cancle')),
+          child: Text(appLocalizations.translate('cancel')),
         ),
         TextButton(
           onPressed: _submitForm,

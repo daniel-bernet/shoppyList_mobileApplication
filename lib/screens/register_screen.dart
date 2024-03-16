@@ -1,13 +1,11 @@
 import 'package:app/l10n/app_localization.dart';
-import 'package:app/screens/main_page.dart';
 import 'package:app/utils/helpers/snackbar_helper.dart';
 import 'package:app/services/api_service.dart';
 import 'package:app/values/app_routes.dart';
+import 'package:app/values/app_regex.dart';
 import 'package:flutter/material.dart';
-import '../components/app_text_form_field.dart';
 import '../utils/common_widgets/gradient_background.dart';
 import '../utils/helpers/navigation_helper.dart';
-import '../utils/theme/app_theme.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -50,13 +48,16 @@ class _RegisterPageState extends State<RegisterPage> {
         passwordController.text.trim(),
       );
 
-      if (success && mounted) {
-        SnackbarHelper.showSnackBar(AppLocalizations.of(context).translate('registrationComplete'));
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => const MainPage(),
-        ));
+      if (!mounted) return null;
+
+      if (success) {
+        SnackbarHelper.showSnackBar(
+            AppLocalizations.of(context).translate('registrationComplete'));
+        NavigationHelper.pushReplacementNamed(AppRoutes.main);
       } else {
-        if (mounted) SnackbarHelper.showSnackBar(AppLocalizations.of(context).translate('registrationFailed'), isError: true);
+        SnackbarHelper.showSnackBar(
+            AppLocalizations.of(context).translate('registrationFailed'),
+            isError: true);
       }
     }
   }
@@ -64,16 +65,28 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
     return Scaffold(
       body: ListView(
+        padding: EdgeInsets.zero,
         children: [
           GradientBackground(
             children: [
-              Text(appLocalizations.translate('register'),
-                  style: AppTheme.lightTheme.textTheme.titleLarge),
+              Text(
+                appLocalizations.translate('register'),
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 6),
-              Text(appLocalizations.translate('createYourAccount'),
-                  style: AppTheme.lightTheme.textTheme.bodySmall),
+              Text(
+                appLocalizations.translate('createYourAccount'),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                ),
+              ),
             ],
           ),
           Padding(
@@ -83,25 +96,50 @@ class _RegisterPageState extends State<RegisterPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  AppTextFormField(
-                    labelText: appLocalizations.translate('name'),
+                  TextFormField(
                     controller: nameController,
-                    textInputAction: TextInputAction.next, keyboardType: TextInputType.name,
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.translate('name'),
+                    ),
+                    textInputAction: TextInputAction.next,
                   ),
-                  AppTextFormField(
-                    labelText: appLocalizations.translate('email'),
+                  const SizedBox(height: 20),
+                  TextFormField(
                     controller: emailController,
-                    textInputAction: TextInputAction.next, keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.translate('email'),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    validator: (value) {
+                      if (!AppRegex.emailRegex.hasMatch(value ?? "")) {
+                        return appLocalizations.translate('emailRequirements');
+                      }
+                      return null;
+                    },
                   ),
-                  AppTextFormField(
-                    labelText: appLocalizations.translate('password'),
+                  const SizedBox(height: 20),
+                  TextFormField(
                     controller: passwordController,
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.translate('password'),
+                    ),
                     obscureText: true,
-                    textInputAction: TextInputAction.next, keyboardType: TextInputType.name,
+                    textInputAction: TextInputAction.next,
+                    validator: (value) {
+                      if (!AppRegex.passwordRegex.hasMatch(value ?? "")) {
+                        return appLocalizations
+                            .translate('passwordRequirements');
+                      }
+                      return null;
+                    },
                   ),
-                  AppTextFormField(
-                    labelText: appLocalizations.translate('confirmPassword'),
+                  const SizedBox(height: 20),
+                  TextFormField(
                     controller: confirmPasswordController,
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.translate('confirmPassword'),
+                    ),
                     obscureText: true,
                     textInputAction: TextInputAction.done,
                     validator: (value) {
@@ -109,8 +147,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         return appLocalizations.translate('passwordNotMatched');
                       }
                       return null;
-                    }, keyboardType: TextInputType.name,
+                    },
                   ),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: _register,
                     child: Text(appLocalizations.translate('register')),
@@ -124,12 +163,10 @@ class _RegisterPageState extends State<RegisterPage> {
             children: [
               Text(
                 appLocalizations.translate('iHaveAnAccount'),
-                style: AppTheme.lightTheme.textTheme.bodySmall,
+                style: theme.textTheme.bodySmall,
               ),
               TextButton(
-                onPressed: () {
-                  NavigationHelper.pushReplacementNamed(AppRoutes.login);
-                },
+                onPressed: () => NavigationHelper.pushReplacementNamed(AppRoutes.login),
                 child: Text(appLocalizations.translate('login')),
               ),
             ],

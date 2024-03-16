@@ -49,7 +49,6 @@ class _UserPageState extends State<UserPage> {
   void initState() {
     super.initState();
     _fetchAccountInfo();
-    _loadTimezonePreference();
   }
 
   void _fetchAccountInfo() async {
@@ -422,13 +421,6 @@ class _UserPageState extends State<UserPage> {
     }
   }
 
-  Future<void> _loadTimezonePreference() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? savedTimezone = prefs.getString('selectedTimezone');
-    final provider = Provider.of<TimezoneProvider>(context, listen: false);
-    provider.setTimezone(savedTimezone ?? 'UTC');
-  }
-
   Future<void> _saveTimezonePreference(String timezone) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('selectedTimezone', timezone);
@@ -452,7 +444,7 @@ class _UserPageState extends State<UserPage> {
     final timezoneProvider = Provider.of<TimezoneProvider>(context);
     final languageProvider = Provider.of<LanguageProvider>(context);
     final appLocalizations = AppLocalizations.of(context);
-    final availableLanguages = ['en', 'de'];
+    final availableLanguages = ['en', 'de', 'fr', 'it', 'es'];
 
     return Scaffold(
       body: ListView(

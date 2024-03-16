@@ -4,10 +4,8 @@ import 'package:app/services/api_service.dart';
 import 'package:app/utils/helpers/snackbar_helper.dart';
 import 'package:app/values/app_routes.dart';
 import 'package:flutter/material.dart';
-import '../components/app_text_form_field.dart';
 import '../utils/common_widgets/gradient_background.dart';
 import '../utils/helpers/navigation_helper.dart';
-import '../utils/theme/app_theme.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -28,7 +26,6 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     emailController = TextEditingController();
     passwordController = TextEditingController();
-    validateTokenAndNavigate();
   }
 
   @override
@@ -36,17 +33,6 @@ class _LoginPageState extends State<LoginPage> {
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
-  }
-
-  Future<void> validateTokenAndNavigate() async {
-    final bool isValidToken = await apiService.validateToken();
-    if (isValidToken) {
-      SnackbarHelper.showSnackBar(AppLocalizations.of(context).translate('loggedIn'));
-      if (!mounted) return;
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => const MainPage(),
-      ));
-    }
   }
 
   void _login() async {
@@ -59,12 +45,15 @@ class _LoginPageState extends State<LoginPage> {
       if (!mounted) return;
 
       if (success) {
-        SnackbarHelper.showSnackBar(AppLocalizations.of(context).translate('loggedIn'));
+        SnackbarHelper.showSnackBar(
+            AppLocalizations.of(context).translate('loggedIn'));
         Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => const MainPage(),
         ));
       } else {
-        SnackbarHelper.showSnackBar(AppLocalizations.of(context).translate('loginFailed'), isError: true);
+        SnackbarHelper.showSnackBar(
+            AppLocalizations.of(context).translate('loginFailed'),
+            isError: true);
       }
     }
   }
@@ -72,6 +61,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final appLocalizations = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+
     return Scaffold(
       body: ListView(
         padding: EdgeInsets.zero,
@@ -79,12 +70,19 @@ class _LoginPageState extends State<LoginPage> {
           GradientBackground(
             children: [
               Text(
-                appLocalizations.translate('signInToYourAccount'),
-                style: AppTheme.lightTheme.textTheme.titleLarge,
+                appLocalizations.translate('login'),
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: theme.colorScheme.onPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 6),
-              Text(appLocalizations.translate('signInToYourAccount'),
-                  style: AppTheme.lightTheme.textTheme.bodySmall),
+              Text(
+                appLocalizations.translate('signInToYourAccount'),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.surface,
+                ),
+              ),
             ],
           ),
           Form(
@@ -95,27 +93,28 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  AppTextFormField(
+                  TextFormField(
                     controller: emailController,
-                    labelText: appLocalizations.translate('email'),
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.translate('email'),
+                    ),
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
-                    validator: (value) {
-                      return value!.isEmpty
-                          ? appLocalizations.translate('pleaseEnterEmailAddress')
-                          : null;
-                    },
+                    validator: (value) => value!.isEmpty
+                        ? appLocalizations.translate('pleaseEnterEmailAddress')
+                        : null,
                   ),
-                  AppTextFormField(
+                  const SizedBox(height: 20),
+                  TextFormField(
                     controller: passwordController,
-                    labelText: appLocalizations.translate('password'),
+                    decoration: InputDecoration(
+                      labelText: appLocalizations.translate('password'),
+                    ),
+                    obscureText: true,
                     textInputAction: TextInputAction.done,
-                    keyboardType: TextInputType.visiblePassword,
-                    validator: (value) {
-                      return value!.isEmpty
-                          ? appLocalizations.translate('pleaseEnterPassword')
-                          : null;
-                    },
+                    validator: (value) => value!.isEmpty
+                        ? appLocalizations.translate('pleaseEnterPassword')
+                        : null,
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
@@ -132,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               Text(
                 appLocalizations.translate('doNotHaveAnAccount'),
-                style: AppTheme.lightTheme.textTheme.bodySmall?.copyWith(color: Colors.black),
+                style: theme.textTheme.bodySmall,
               ),
               const SizedBox(width: 4),
               TextButton(
