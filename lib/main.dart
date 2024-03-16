@@ -1,3 +1,5 @@
+import 'package:app/l10n/app_localization.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:app/providers/language_provider.dart';
 import 'package:app/providers/timezone_provider.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +13,6 @@ import 'values/app_routes.dart';
 import 'values/app_strings.dart';
 import 'routes.dart';
 import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
 
 void main() {
   tz.initializeTimeZones();
@@ -45,6 +46,24 @@ class ShoppyListApp extends StatelessWidget {
           scaffoldMessengerKey: SnackbarHelper.key,
           navigatorKey: NavigationHelper.key,
           onGenerateRoute: Routes.generateRoute,
+          supportedLocales: const [
+            Locale('en', ''),
+            Locale('de', ''),
+          ],
+          localizationsDelegates: const [
+            AppLocalizationsDelegate(),
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          localeResolutionCallback: (locale, supportedLocales) {
+            for (var supportedLocale in supportedLocales) {
+              if (supportedLocale.languageCode == locale?.languageCode) {
+                return supportedLocale;
+              }
+            }
+            return supportedLocales.first;
+          },
         ),
       ),
     );

@@ -11,9 +11,7 @@ import '../utils/helpers/navigation_helper.dart';
 import '../values/app_strings.dart';
 import '../values/app_routes.dart';
 import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../providers/timezone_provider.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});
@@ -92,21 +90,21 @@ class _UserPageState extends State<UserPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        final TextEditingController _newEmailController =
+        final TextEditingController newEmailController =
             TextEditingController();
-        final TextEditingController _currentPasswordController =
+        final TextEditingController currentPasswordController =
             TextEditingController();
-        final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+        final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
         return AlertDialog(
           title: const Text(AppStrings.changeEmail),
           content: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 TextFormField(
-                  controller: _newEmailController,
+                  controller: newEmailController,
                   decoration: const InputDecoration(hintText: "New Email"),
                   validator: (value) {
                     if (value == null ||
@@ -119,7 +117,7 @@ class _UserPageState extends State<UserPage> {
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
-                  controller: _currentPasswordController,
+                  controller: currentPasswordController,
                   decoration:
                       const InputDecoration(hintText: "Current Password"),
                   validator: (value) {
@@ -143,24 +141,28 @@ class _UserPageState extends State<UserPage> {
             TextButton(
               child: const Text(AppStrings.submit),
               onPressed: () async {
-                if (_formKey.currentState!.validate()) {
+                if (formKey.currentState!.validate()) {
                   bool success = await apiService.editEmail(
-                    _newEmailController.text.trim(),
-                    _currentPasswordController.text.trim(),
+                    newEmailController.text.trim(),
+                    currentPasswordController.text.trim(),
                   );
 
                   if (success) {
-                    Navigator.of(context).pop();
-                    _fetchAccountInfo(); // Refresh account information
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text(AppStrings.emailChangedSuccess)),
-                    );
+                    if (context.mounted) Navigator.of(context).pop();
+                    _fetchAccountInfo();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text(AppStrings.emailChangedSuccess)),
+                      );
+                    }
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text(AppStrings.emailChangedFailure)),
-                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text(AppStrings.emailChangedFailure)),
+                      );
+                    }
                   }
                 }
               },
@@ -231,17 +233,21 @@ class _UserPageState extends State<UserPage> {
                   );
 
                   if (success) {
-                    Navigator.of(context).pop();
+                    if (context.mounted) Navigator.of(context).pop();
                     _fetchAccountInfo();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text(AppStrings.usernameChangedSuccess)),
-                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text(AppStrings.usernameChangedSuccess)),
+                      );
+                    }
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text(AppStrings.usernameChangedFailure)),
-                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text(AppStrings.usernameChangedFailure)),
+                      );
+                    }
                   }
                 }
               },
@@ -333,16 +339,20 @@ class _UserPageState extends State<UserPage> {
                   );
 
                   if (success) {
-                    Navigator.of(context).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text(AppStrings.passwordChangedSuccess)),
-                    );
+                    if (context.mounted) Navigator.of(context).pop();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text(AppStrings.passwordChangedSuccess)),
+                      );
+                    }
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text(AppStrings.passwordChangedFailure)),
-                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text(AppStrings.passwordChangedFailure)),
+                      );
+                    }
                   }
                 }
               },
