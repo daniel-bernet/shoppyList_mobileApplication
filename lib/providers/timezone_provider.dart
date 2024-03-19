@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TimezoneProvider with ChangeNotifier {
-  String _timezone = 'UTC';
+  String _timezone = 'Europe/Berlin';
 
   TimezoneProvider() {
     loadTimezone();

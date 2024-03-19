@@ -12,7 +12,6 @@ import '../utils/helpers/navigation_helper.dart';
 import '../values/app_strings.dart';
 import '../values/app_routes.dart';
 import 'package:timezone/timezone.dart' as tz;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});
@@ -26,29 +25,30 @@ class _UserPageState extends State<UserPage> {
   Map<String, dynamic>? accountInfo;
   String? selectedTimezone;
 
-  final List<String> timezones = [
-    'Pacific/Honolulu',
-    'America/Anchorage',
-    'America/Los_Angeles',
-    'America/Denver',
-    'America/Chicago',
-    'America/New_York',
-    'America/Argentina/Buenos_Aires',
-    'Atlantic/Reykjavik',
-    'Europe/London',
-    'Europe/Berlin',
-    'Europe/Athens',
-    'Asia/Dubai',
-    'Asia/Kolkata',
-    'Asia/Shanghai',
-    'Asia/Tokyo',
-    'Australia/Sydney',
-  ];
+  Map<String, String> timezoneMapping = {
+    'Pacific/Honolulu': 'Honolulu (HST)',
+    'America/Anchorage': 'Anchorage (AKST)',
+    'America/Los_Angeles': 'Los Angeles (PST)',
+    'America/Denver': 'Denver (MST)',
+    'America/Chicago': 'Chicago (CST)',
+    'America/New_York': 'New York (EST)',
+    'America/Argentina/Buenos_Aires': 'Buenos Aires (ART)',
+    'Atlantic/Reykjavik': 'Reykjavik (GMT)',
+    'Europe/London': 'London (GMT/BST)',
+    'Europe/Berlin': 'Berlin (CET/CEST)',
+    'Europe/Athens': 'Athens (EET/EEST)',
+    'Asia/Dubai': 'Dubai (GST)',
+    'Asia/Kolkata': 'Kolkata (IST)',
+    'Asia/Shanghai': 'Shanghai (CST)',
+    'Asia/Tokyo': 'Tokyo (JST)',
+    'Australia/Sydney': 'Sydney (AEDT)',
+  };
 
   @override
   void initState() {
     super.initState();
     _fetchAccountInfo();
+    _loadInitialTimezone();
   }
 
   void _fetchAccountInfo() async {
@@ -422,10 +422,14 @@ class _UserPageState extends State<UserPage> {
   }
 
   Future<void> _saveTimezonePreference(String timezone) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('selectedTimezone', timezone);
     final provider = Provider.of<TimezoneProvider>(context, listen: false);
     provider.setTimezone(timezone);
+  }
+
+  void _loadInitialTimezone() {
+    final timezoneProvider =
+        Provider.of<TimezoneProvider>(context, listen: false);
+    selectedTimezone = timezoneProvider.timezone;
   }
 
   String _formatRegisteredOn(String? registeredOn, String timezone) {
@@ -502,17 +506,21 @@ class _UserPageState extends State<UserPage> {
             title: Text(appLocalizations.translate('timezone')),
             trailing: DropdownButton<String>(
               value: selectedTimezone,
-              onChanged: (String? newValue) async {
-                setState(() {
-                  selectedTimezone = newValue;
-                  tz.setLocalLocation(tz.getLocation(newValue!));
-                });
-                await _saveTimezonePreference(newValue!);
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    selectedTimezone = newValue;
+                    tz.setLocalLocation(tz.getLocation(newValue));
+                  });
+                  _saveTimezonePreference(newValue);
+                }
               },
-              items: timezones.map<DropdownMenuItem<String>>((String value) {
+              items: timezoneMapping.entries
+                  .map<DropdownMenuItem<String>>((entry) {
                 return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
+                  value:
+                      entry.key,
+                  child: Text(entry.value),
                 );
               }).toList(),
             ),
