@@ -1,4 +1,5 @@
 import 'package:app/l10n/app_localization.dart';
+import 'package:app/screens/custom_splash_screen.dart';
 import 'package:app/screens/login_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:app/providers/language_provider.dart';
@@ -101,7 +102,7 @@ class ShoppyListAppState extends State<ShoppyListApp> {
             future: startScreenFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Material();
+                return const CustomSplashScreen();
               }
               return snapshot.data ?? const LoginPage();
             },

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Background gradient -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#e0e0e0"   
+                android:endColor="#bdbdbd"     
+                android:angle="135" />         
+        </shape>
+    </item>
+
+    <!-- Contrasting line at the top -->
+    <item android:top="20dp" android:right="-40dp" android:left="-40dp" android:height="50dp">
+        <rotate
+            android:fromDegrees="45">
+            <shape android:shape="rectangle">
+                <solid android:color="#a0a0a0"/> <!-- Contrast line color -->
+            </shape>
+        </rotate>
+    </item>
+
+    <!-- Contrasting line at the bottom -->
+    <item android:bottom="20dp" android:right="-40dp" android:left="-40dp" android:height="50dp">
+        <rotate
+            android:fromDegrees="-45">
+            <shape android:shape="rectangle">
+                <solid android:color="#a0a0a0"/> <!-- Contrast line color -->
+            </shape>
+        </rotate>
+    </item>
+
+</layer-list>

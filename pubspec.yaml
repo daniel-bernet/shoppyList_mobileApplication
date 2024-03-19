@@ -42,3 +42,4 @@ flutter:
     - assets/languages/fr.json
     - assets/languages/it.json
     - assets/languages/es.json
+    - assets/logo/shoppylist.png
