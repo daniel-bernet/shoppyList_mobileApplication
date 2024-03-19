@@ -111,9 +111,9 @@
     "myListsPage": "My Lists",
     "userPage": "User",
 
-    "gram": "gram",
-    "kiloGram": "kilogram",
-    "deciLitre": "deciliter",
-    "litre": "liter",
-    "piece": "piece"
+    "gram": "g",
+    "kiloGram": "kg",
+    "deciLitre": "dl",
+    "litre": "L",
+    "piece": "pcs"
 }

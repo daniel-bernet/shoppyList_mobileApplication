@@ -25,12 +25,18 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: true
+  image_path: "assets/icon/shoppylist_logo.png"
+  adaptive_icon_background: "#434153"
+  adaptive_icon_foreground: "assets/icon/shoppylist_logo.png"
 
 flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/
     - assets/languages/en.json
     - assets/languages/de.json
     - assets/languages/fr.json

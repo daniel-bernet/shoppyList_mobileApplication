@@ -15,20 +15,20 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 2;
 
   final List<Widget> _pageOptions = [
     const ShoppingPage(),
-    const AddItemPage(),
     const ViewListPage(),
+    const AddItemPage(),
     const MyListsPage(),
     const UserPage(),
   ];
 
   final List<String> _pageTitle = [
     'shoppingPage',
-    'addItemPage',
     'viewListPage',
+    'addItemPage',
     'myListsPage',
     'userPage',
   ];

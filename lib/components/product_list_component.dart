@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../l10n/app_localization.dart'; // Import localization
+import '../l10n/app_localization.dart';
 import '../providers/shopping_list_provider.dart';
 
 class ProductList extends StatefulWidget {
@@ -118,7 +118,14 @@ class ProductListState extends State<ProductList> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: ElevatedButton(
                 onPressed: () => _showFinishShoppingConfirmation(context),
-                child: Text(appLocalizations.translate('finishShopping')),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.shopping_cart_checkout),
+                    const SizedBox(width: 8.0),
+                    Text(appLocalizations.translate('finishShopping')),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 10),

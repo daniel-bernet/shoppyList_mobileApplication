@@ -22,15 +22,15 @@ class CustomBottomNavigationBar extends StatelessWidget {
           label: appLocalizations.translate('shoppingPage'),
         ),
         BottomNavigationBarItem(
+          icon: const Icon(Icons.format_list_bulleted),
+          label: appLocalizations.translate('viewListPage'),
+        ),
+        BottomNavigationBarItem(
           icon: const Icon(Icons.add_box),
           label: appLocalizations.translate('addItemPage'),
         ),
         BottomNavigationBarItem(
-          icon: const Icon(Icons.view_list),
-          label: appLocalizations.translate('viewListPage'),
-        ),
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.list),
+          icon: const Icon(Icons.format_list_bulleted_add),
           label: appLocalizations.translate('myListsPage'),
         ),
         BottomNavigationBarItem(
@@ -42,7 +42,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
       selectedItemColor: theme.colorScheme.primary,
       unselectedItemColor: theme.colorScheme.onSurface.withOpacity(0.6),
       onTap: onIndexSelected,
+      iconSize: 30.0,
     );
   }
 }
-

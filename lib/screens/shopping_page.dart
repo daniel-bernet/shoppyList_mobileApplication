@@ -29,16 +29,21 @@ class ShoppingPageState extends State<ShoppingPage> {
 
     return Scaffold(
       body: nonEmptyShoppingLists == null || nonEmptyShoppingLists.isEmpty
-          ? Center(child: Text(AppLocalizations.of(context).translate('noListsWithItemsAvailable')))
-          : ListView.builder(
-              itemCount: nonEmptyShoppingLists.length,
-              itemBuilder: (context, index) {
-                var list = nonEmptyShoppingLists[index];
-                return ProductList(
-                  listId: list['id'],
-                  title: list['title'],
-                );
-              },
+          ? Center(
+              child: Text(AppLocalizations.of(context)
+                  .translate('noListsWithItemsAvailable')))
+          : Padding(
+              padding: const EdgeInsets.all(12),
+              child: ListView.builder(
+                itemCount: nonEmptyShoppingLists.length,
+                itemBuilder: (context, index) {
+                  var list = nonEmptyShoppingLists[index];
+                  return ProductList(
+                    listId: list['id'],
+                    title: list['title'],
+                  );
+                },
+              ),
             ),
     );
   }

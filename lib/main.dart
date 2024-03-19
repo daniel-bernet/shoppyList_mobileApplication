@@ -3,8 +3,7 @@ import 'package:app/screens/login_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:app/providers/language_provider.dart';
 import 'package:app/providers/timezone_provider.dart';
-import 'package:app/screens/loading_screen.dart';
-import 'package:app/screens/main_page.dart'; 
+import 'package:app/screens/main_page.dart';
 import 'package:app/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -39,25 +38,31 @@ class ShoppyListApp extends StatefulWidget {
 
 class ShoppyListAppState extends State<ShoppyListApp> {
   final ApiService apiService = ApiService();
-  late Future<bool> loginCheckFuture;
+  late Future<Widget> startScreenFuture;
 
   @override
   void initState() {
     super.initState();
-    loginCheckFuture = checkLoginStatus();
+    startScreenFuture = determineStartScreen();
   }
 
-  Future<bool> checkLoginStatus() async {
+  Future<Widget> determineStartScreen() async {
     final startTime = DateTime.now();
-    final isValidToken = await apiService.validateToken();
-    final endTime = DateTime.now();
 
-    final timeDiff = endTime.difference(startTime);
-    if (timeDiff < const Duration(seconds: 1)) {
-      await Future.delayed(const Duration(seconds: 1) - timeDiff);
+    Widget nextScreen = const LoginPage();
+
+    bool isValidToken = await apiService.validateToken();
+
+    if (isValidToken) {
+      nextScreen = const MainPage();
     }
 
-    return isValidToken;
+    final elapsedTime = DateTime.now().difference(startTime);
+    if (elapsedTime < const Duration(seconds: 3)) {
+      await Future.delayed(const Duration(seconds: 3) - elapsedTime);
+    }
+
+    return nextScreen;
   }
 
   @override
@@ -70,7 +75,8 @@ class ShoppyListAppState extends State<ShoppyListApp> {
         ChangeNotifierProvider(create: (_) => widget.languageProvider),
       ],
       child: Consumer2<ThemeProvider, LanguageProvider>(
-        builder: (context, themeProvider, languageProvider, child) => MaterialApp(
+        builder: (context, themeProvider, languageProvider, child) =>
+            MaterialApp(
           debugShowCheckedModeBanner: false,
           title: AppStrings.loginAndRegister,
           theme: themeProvider.themeData,
@@ -91,18 +97,13 @@ class ShoppyListAppState extends State<ShoppyListApp> {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          home: FutureBuilder<bool>(
-            future: loginCheckFuture,
+          home: FutureBuilder<Widget>(
+            future: startScreenFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const LoadingScreen();
-              } else {
-                if (snapshot.data == true) {
-                  return const MainPage();
-                } else {
-                  return const LoginPage();
-                }
+                return const Material();
               }
+              return snapshot.data ?? const LoginPage();
             },
           ),
         ),
