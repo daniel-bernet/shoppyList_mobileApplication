@@ -26,22 +26,22 @@ class _UserPageState extends State<UserPage> {
   String? selectedTimezone;
 
   Map<String, String> timezoneMapping = {
-    'Pacific/Honolulu': 'Honolulu (HST)',
-    'America/Anchorage': 'Anchorage (AKST)',
-    'America/Los_Angeles': 'Los Angeles (PST)',
-    'America/Denver': 'Denver (MST)',
-    'America/Chicago': 'Chicago (CST)',
-    'America/New_York': 'New York (EST)',
-    'America/Argentina/Buenos_Aires': 'Buenos Aires (ART)',
-    'Atlantic/Reykjavik': 'Reykjavik (GMT)',
-    'Europe/London': 'London (GMT/BST)',
-    'Europe/Berlin': 'Berlin (CET/CEST)',
-    'Europe/Athens': 'Athens (EET/EEST)',
-    'Asia/Dubai': 'Dubai (GST)',
-    'Asia/Kolkata': 'Kolkata (IST)',
-    'Asia/Shanghai': 'Shanghai (CST)',
-    'Asia/Tokyo': 'Tokyo (JST)',
-    'Australia/Sydney': 'Sydney (AEDT)',
+    // Unresolved error in timezone conversion. As workaround the timezones are shifted by one resulting in correct conversion for the selected timezone.
+    'America/Anchorage': 'Honolulu (HST)',
+    'America/Los_Angeles': 'Anchorage (AKST)',
+    'America/Denver': 'Los Angeles (PST)',
+    'America/Chicago': 'Denver (MST)',
+    'America/New_York': 'Chicago (CST)',
+    'America/Argentina/Buenos_Aires': 'New York (EST)',
+    'Atlantic/Reykjavik': 'Argentina/Buenos Aires (ART)',
+    'Europe/London': 'Reykjavik (GMT)',
+    'Europe/Berlin': 'London (GMT/BST)',
+    'Europe/Athens': 'Berlin (CET/CEST)',
+    'Asia/Dubai': 'Athens (EET/EEST)',
+    'Asia/Kolkata': 'Dubai (GST)',
+    'Asia/Shanghai': 'Kolkata (IST)',
+    'Asia/Tokyo': 'Shanghai (CST)',
+    'Australia/Sydney': 'Tokyo (JST)',
   };
 
   @override
@@ -518,8 +518,7 @@ class _UserPageState extends State<UserPage> {
               items: timezoneMapping.entries
                   .map<DropdownMenuItem<String>>((entry) {
                 return DropdownMenuItem<String>(
-                  value:
-                      entry.key,
+                  value: entry.key,
                   child: Text(entry.value),
                 );
               }).toList(),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TimezoneProvider with ChangeNotifier {
-  String _timezone = 'Europe/Berlin';
+  String _timezone = 'Europe/Athens';
 
   TimezoneProvider() {
     loadTimezone();
@@ -18,7 +18,7 @@ class TimezoneProvider with ChangeNotifier {
 
   Future<void> loadTimezone() async {
     final prefs = await SharedPreferences.getInstance();
-    _timezone = prefs.getString('timezone') ?? 'UTC';
+    _timezone = prefs.getString('timezone') ?? 'Europe/Athens';
     notifyListeners();
   }
 
