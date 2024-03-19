@@ -13,7 +13,6 @@ import 'utils/helpers/navigation_helper.dart';
 import 'utils/helpers/snackbar_helper.dart';
 import 'providers/theme_provider.dart';
 import 'providers/shopping_list_provider.dart';
-import 'values/app_strings.dart';
 import 'routes.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
@@ -79,7 +78,7 @@ class ShoppyListAppState extends State<ShoppyListApp> {
         builder: (context, themeProvider, languageProvider, child) =>
             MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: AppStrings.loginAndRegister,
+          title: "ShoppyList",
           theme: themeProvider.themeData,
           locale: Locale(languageProvider.currentLanguage, ''),
           scaffoldMessengerKey: SnackbarHelper.key,

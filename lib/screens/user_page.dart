@@ -3,13 +3,12 @@ import 'package:app/providers/language_provider.dart';
 import 'package:app/providers/timezone_provider.dart';
 import 'package:app/utils/helpers/snackbar_helper.dart';
 import 'package:app/providers/theme_provider.dart';
-import 'package:app/values/app_regex.dart';
+import 'package:app/values/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../services/api_service.dart';
 import '../utils/helpers/navigation_helper.dart';
-import '../values/app_strings.dart';
 import '../values/app_routes.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -105,7 +104,7 @@ class _UserPageState extends State<UserPage> {
         final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
         return AlertDialog(
-          title: const Text(AppStrings.changeEmail),
+          title: Text(appLocalizations.translate('changeEmail')),
           content: Form(
             key: formKey,
             child: Column(
@@ -143,13 +142,13 @@ class _UserPageState extends State<UserPage> {
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text(AppStrings.cancel),
+              child: Text(appLocalizations.translate('cancel')),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text(AppStrings.submit),
+              child: Text(appLocalizations.translate('submit')),
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
                   bool success = await apiService.editEmail(
@@ -162,15 +161,17 @@ class _UserPageState extends State<UserPage> {
                     _fetchAccountInfo();
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text(AppStrings.emailChangedSuccess)),
+                        SnackBar(
+                            content: Text(appLocalizations
+                                .translate('emailChangedSuccess'))),
                       );
                     }
                   } else {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text(AppStrings.emailChangedFailure)),
+                        SnackBar(
+                            content: Text(appLocalizations
+                                .translate('emailChangedFailure'))),
                       );
                     }
                   }
@@ -195,7 +196,7 @@ class _UserPageState extends State<UserPage> {
         final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
         return AlertDialog(
-          title: const Text(AppStrings.changeUsername),
+          title: Text(appLocalizations.translate('changeUsername')),
           content: Form(
             key: formKey,
             child: Column(
@@ -314,7 +315,7 @@ class _UserPageState extends State<UserPage> {
                     if (value == null || value.isEmpty) {
                       return appLocalizations.translate('pleaseEnterPassoword');
                     }
-                    if (!AppRegex.passwordRegex.hasMatch(value)) {
+                    if (!AppConstants.passwordRegex.hasMatch(value)) {
                       return appLocalizations.translate('invalidPassword');
                     }
                     return null;

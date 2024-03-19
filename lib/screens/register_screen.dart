@@ -1,8 +1,8 @@
 import 'package:app/l10n/app_localization.dart';
 import 'package:app/utils/helpers/snackbar_helper.dart';
 import 'package:app/services/api_service.dart';
+import 'package:app/values/app_constants.dart';
 import 'package:app/values/app_routes.dart';
-import 'package:app/values/app_regex.dart';
 import 'package:flutter/material.dart';
 import '../utils/common_widgets/gradient_background.dart';
 import '../utils/helpers/navigation_helper.dart';
@@ -112,7 +112,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
                     validator: (value) {
-                      if (!AppRegex.emailRegex.hasMatch(value ?? "")) {
+                      if (!AppConstants.emailRegex.hasMatch(value ?? "")) {
                         return appLocalizations.translate('emailRequirements');
                       }
                       return null;
@@ -127,7 +127,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     obscureText: true,
                     textInputAction: TextInputAction.next,
                     validator: (value) {
-                      if (!AppRegex.passwordRegex.hasMatch(value ?? "")) {
+                      if (!AppConstants.passwordRegex.hasMatch(value ?? "")) {
                         return appLocalizations
                             .translate('passwordRequirements');
                       }

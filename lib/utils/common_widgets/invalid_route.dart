@@ -1,18 +1,16 @@
+import 'package:app/l10n/app_localization.dart';
 import 'package:flutter/material.dart';
-
-import '../../values/app_strings.dart';
 
 class InvalidRoute extends StatelessWidget {
   const InvalidRoute({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
         child: Text(
-          AppStrings.uhOhPageNotFound,
+          AppLocalizations.of(context).translate('uhOhPageNotFound'),
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
         ),
       ),
     );

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // Light Theme Colors
+  // Light Theme Colors:
   static const Color lightPrimaryColor = Color(0xFF6200EE);
   static const Color lightOnPrimaryColor = Colors.white;
   static const Color lightSecondaryColor = Color(0xFF757575);
@@ -12,7 +12,7 @@ class AppColors {
   static const List<Color> lightGradient = [lightPrimaryColor, lightSecondaryColor];
   static const Color lightWarningColor = Colors.red;
 
-  // Dark Theme Colors
+  // Dark Theme Colors:
   static const Color darkPrimaryColor = Color(0xFFBB86FC);
   static const Color darkOnPrimaryColor = Colors.black;
   static const Color darkSecondaryColor = Color(0xFFBDBDBD);
