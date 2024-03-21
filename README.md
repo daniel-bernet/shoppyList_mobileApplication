@@ -15,6 +15,7 @@ ShoppyList empowers users to create and manage their shopping lists effortlessly
 - Integrated help texts and introduction page enhance the understanding of functionalities.
 
 #### GUI Design Process
+- Initial moqup design and project planning, evolved over time with feedback, flutter features and ease of implementation. Files deposited here: `/documentation_files`
 - An iterative design approach ensures continuous refinement based on user feedback. (in essence my mother)
 
 #### App Requirements
