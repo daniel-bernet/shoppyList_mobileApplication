@@ -1,4 +1,6 @@
+import 'package:app/components/password_field.dart';
 import 'package:app/l10n/app_localization.dart';
+import 'package:app/screens/indtroduction_screen.dart';
 import 'package:app/utils/helpers/snackbar_helper.dart';
 import 'package:app/services/api_service.dart';
 import 'package:app/values/app_constants.dart';
@@ -53,7 +55,9 @@ class _RegisterPageState extends State<RegisterPage> {
       if (success) {
         SnackbarHelper.showSnackBar(
             AppLocalizations.of(context).translate('registrationComplete'));
-        NavigationHelper.pushReplacementNamed(AppRoutes.main);
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => const IntroductionScreen(),
+        ));
       } else {
         SnackbarHelper.showSnackBar(
             AppLocalizations.of(context).translate('registrationFailed'),
@@ -119,13 +123,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                   ),
                   const SizedBox(height: 20),
-                  TextFormField(
+                  PasswordField(
                     controller: passwordController,
-                    decoration: InputDecoration(
-                      labelText: appLocalizations.translate('password'),
-                    ),
-                    obscureText: true,
-                    textInputAction: TextInputAction.next,
+                    labelText: appLocalizations.translate('password'),
                     validator: (value) {
                       if (!AppConstants.passwordRegex.hasMatch(value ?? "")) {
                         return appLocalizations
@@ -135,13 +135,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                   ),
                   const SizedBox(height: 20),
-                  TextFormField(
+                  PasswordField(
                     controller: confirmPasswordController,
-                    decoration: InputDecoration(
-                      labelText: appLocalizations.translate('confirmPassword'),
-                    ),
-                    obscureText: true,
-                    textInputAction: TextInputAction.done,
+                    labelText: appLocalizations.translate('confirmPassword'),
                     validator: (value) {
                       if (value != passwordController.text) {
                         return appLocalizations.translate('passwordNotMatched');
@@ -166,7 +162,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 style: theme.textTheme.bodySmall,
               ),
               TextButton(
-                onPressed: () => NavigationHelper.pushReplacementNamed(AppRoutes.login),
+                onPressed: () =>
+                    NavigationHelper.pushReplacementNamed(AppRoutes.login),
                 child: Text(appLocalizations.translate('login')),
               ),
             ],

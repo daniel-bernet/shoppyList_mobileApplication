@@ -5,7 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ApiService {
-  final String _baseUrl = 'https://kingseba.onnube.ch';
+//  final String _baseUrl = 'https://kingseba.onnube.ch';
+  final String _baseUrl = 'http://84.74.1.146:5000';
   final storage = const FlutterSecureStorage();
 
   Future<bool> login(String email, String password) async {

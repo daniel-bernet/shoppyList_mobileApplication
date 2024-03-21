@@ -40,7 +40,13 @@ class ListComponent extends StatelessWidget {
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-              child: Text(appLocalizations.translate('leave')),
+              child: Text(
+                appLocalizations.translate('leave'),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               onPressed: () => _removeSelf(context),
             ),
           ],
@@ -54,10 +60,13 @@ class ListComponent extends StatelessWidget {
     Navigator.of(context).pop();
     final success = await apiService.leaveListAsCollaborator(listId);
     if (success) {
-      SnackbarHelper.showSnackBar(appLocalizations.translate('successfullyLeftList'));
+      SnackbarHelper.showSnackBar(
+          appLocalizations.translate('successfullyLeftList'));
       fetchLists();
     } else {
-      SnackbarHelper.showSnackBar(appLocalizations.translate('failedToLeaveList'), isError: true);
+      SnackbarHelper.showSnackBar(
+          appLocalizations.translate('failedToLeaveList'),
+          isError: true);
     }
   }
 

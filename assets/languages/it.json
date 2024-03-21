@@ -114,5 +114,14 @@
     "kiloGram": "kg",
     "deciLitre": "dl",
     "litre": "l",
-    "piece": "pz"
+    "piece": "pz",
+
+    "welcomeToShoppyList": "Benvenuto su ShoppyList!",
+    "appDescription": "ShoppyList ti aiuta a creare e gestire le tue liste della spesa senza sforzo. Naviga tra le nostre schede intuitive per aggiungere articoli, visualizzare le liste, collaborare con amici e gestire il tuo account.",
+    "shoppingPageDescription": "La tua lista della spesa virtuale. Contrassegna gli articoli mentre fai la spesa e gestisci facilmente il tuo carrello. Assicurati di acquistare ogni elemento essenziale senza ridondanze.",
+    "viewListPageDescription": "Rivedi e aggiusta le tue liste della spesa senza interruzioni. Modifica i dettagli dei prodotti secondo necessità, assicurandoti che la tua lista corrisponda sempre alle tue esigenze attuali.",
+    "addItemPageDescription": "Aggiungi nuovi articoli alla tua lista senza sforzo, assicurandoti di essere sempre preparato. Che tu stia pianificando in anticipo o facendo aggiunte spontanee, la tua spesa è ottimizzata.",
+    "myListsPageDescription": "Organizza i tuoi acquisti in modo efficiente con una gestione completa delle liste. Personalizza le liste per diverse esigenze, collabora con amici e semplifica le tue occasioni di acquisto.",
+    "userPageDescription": "Personalizza la tua esperienza nella Pagina Utente. Gestisci il tuo profilo e le impostazioni, adattando ShoppyList alle tue abitudini e preferenze di acquisto.",
+    "getStarted": "Inizia!"
 }

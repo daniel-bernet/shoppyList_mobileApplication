@@ -97,6 +97,12 @@ class ProductListState extends State<ProductList> {
     final provider = Provider.of<ShoppingListProvider>(context);
     final products = provider.productDetails[widget.listId] ?? [];
 
+    for (var product in products) {
+      if (!_checkedProducts.containsKey(product['id'])) {
+        _checkedProducts[product['id']] = false;
+      }
+    }
+
     return Card(
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
@@ -106,7 +112,7 @@ class ProductListState extends State<ProductList> {
           children: [
             ...products.map((product) => ListTile(
                   leading: Checkbox(
-                    value: _checkedProducts[product['id']],
+                    value: _checkedProducts[product['id']] ?? false,
                     onChanged: (bool? value) {
                       _toggleChecked(product['id'], value);
                     },

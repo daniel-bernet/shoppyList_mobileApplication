@@ -1,3 +1,4 @@
+import 'package:app/components/password_field.dart';
 import 'package:app/l10n/app_localization.dart';
 import 'package:app/screens/main_page.dart';
 import 'package:app/services/api_service.dart';
@@ -105,16 +106,13 @@ class _LoginPageState extends State<LoginPage> {
                         : null,
                   ),
                   const SizedBox(height: 20),
-                  TextFormField(
+                  PasswordField(
                     controller: passwordController,
-                    decoration: InputDecoration(
-                      labelText: appLocalizations.translate('password'),
-                    ),
-                    obscureText: true,
-                    textInputAction: TextInputAction.done,
+                    labelText: appLocalizations.translate('password'),
                     validator: (value) => value!.isEmpty
                         ? appLocalizations.translate('pleaseEnterPassword')
                         : null,
+                    textInputAction: TextInputAction.done,
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
