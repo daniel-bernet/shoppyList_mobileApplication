@@ -1,10 +1,12 @@
 import 'package:app/components/password_field.dart';
 import 'package:app/l10n/app_localization.dart';
+import 'package:app/providers/shopping_list_provider.dart';
 import 'package:app/screens/main_page.dart';
 import 'package:app/services/api_service.dart';
 import 'package:app/utils/helpers/snackbar_helper.dart';
 import 'package:app/values/app_routes.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../utils/common_widgets/gradient_background.dart';
 import '../utils/helpers/navigation_helper.dart';
 
@@ -46,6 +48,8 @@ class _LoginPageState extends State<LoginPage> {
       if (!mounted) return;
 
       if (success) {
+        Provider.of<ShoppingListProvider>(context, listen: false)
+            .fetchShoppingListsAndProducts();
         SnackbarHelper.showSnackBar(
             AppLocalizations.of(context).translate('loggedIn'));
         Navigator.of(context).pushReplacement(MaterialPageRoute(
@@ -133,7 +137,8 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(width: 4),
               TextButton(
-                onPressed: () => NavigationHelper.pushReplacementNamed(AppRoutes.register),
+                onPressed: () =>
+                    NavigationHelper.pushReplacementNamed(AppRoutes.register),
                 child: Text(appLocalizations.translate('register')),
               ),
             ],
