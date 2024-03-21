@@ -2,7 +2,7 @@
 
 ## Welcome to ShoppyList!
 
-![ShoppyList Logo](assets\logo\shoppylist.png)
+![ShoppyList Logo](./assets/logo/shoppylist.png)
 
 ShoppyList empowers users to create and manage their shopping lists effortlessly, utilizing an interface designed with ergonomic principles to enhance intuitiveness and user experience.
 
