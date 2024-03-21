@@ -33,6 +33,7 @@ class ProductComponent extends StatelessWidget {
     ApiService apiService = ApiService();
     final success =
         await apiService.deleteProductFromShoppingList(listId, productId);
+    if (!context.mounted) return;
     final appLocalizations = AppLocalizations.of(context);
     if (success) {
       SnackbarHelper.showSnackBar(

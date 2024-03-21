@@ -68,6 +68,7 @@ class _EditListFormState extends State<EditListForm> {
 
   void _deleteList() async {
     final success = await _apiService.deleteShoppingList(widget.listId);
+    if (!mounted) return;
     final appLocalizations = AppLocalizations.of(context);
     if (success) {
       widget.fetchLists();

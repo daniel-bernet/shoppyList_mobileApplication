@@ -29,7 +29,7 @@ class IntroductionScreenState extends State<IntroductionScreen> {
     final appLocalizations = AppLocalizations.of(context);
 
     List<Widget> introPages = [
-      LogoPage(),
+      const LogoPage(),
       IntroPage(
         title: appLocalizations.translate('shoppingPage'),
         description: appLocalizations.translate('shoppingPageDescription'),

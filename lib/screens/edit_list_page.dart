@@ -92,7 +92,7 @@ class _EditListPageState extends State<EditListPage> {
     if (success) {
       widget.onDelete();
       SnackbarHelper.showSnackBar('List deleted successfully');
-      Navigator.of(context).pop();
+      if (mounted) Navigator.of(context).pop();
     } else {
       SnackbarHelper.showSnackBar('Failed to delete list', isError: true);
     }
